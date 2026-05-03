@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
-import { ArrowDownLeft, ArrowUpRight, Repeat, ShoppingBag, TrendingUp, Copy, Check } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Repeat, ShoppingBag, Sparkles, Copy, Check, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { getOrCreateWallet, getEthBalance, shortAddress } from "@/lib/wallet";
+import { getOrCreateWallet, getXlmBalance, shortAddress, fundTestnet, NETWORK_LABEL } from "@/lib/wallet";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
 
-const ETH_PRICE = 3420; // mocked spot for USD display
-const FAKE_ASSETS = [
-  { sym: "USDC", name: "USD Coin", price: 1, change: 0.0, bal: 0, color: "from-sky-400 to-blue-500" },
-  { sym: "BTC", name: "Bitcoin", price: 92840, change: 2.4, bal: 0, color: "from-amber-400 to-orange-500" },
-];
+const XLM_PRICE = 0.12; // mocked spot for USD display
 
 type Tx = {
   id: string;
@@ -24,19 +20,20 @@ type Tx = {
 
 export function WalletView() {
   const { user } = useAuth();
-  const [eth, setEth] = useState(0);
-  const [address, setAddress] = useState<`0x${string}`>("0x0" as `0x${string}`);
+  const [xlm, setXlm] = useState(0);
+  const [address, setAddress] = useState("");
   const [copied, setCopied] = useState(false);
   const [txs, setTxs] = useState<Tx[]>([]);
+  const [funding, setFunding] = useState(false);
+
+  const refreshBalance = (addr: string) => getXlmBalance(addr).then(setXlm);
 
   useEffect(() => {
     if (!user) return;
     const w = getOrCreateWallet();
-    setAddress(w.address);
-    // persist wallet address to profile (idempotent)
-    supabase.from("profiles").update({ wallet_address: w.address }).eq("id", user.id);
-
-    getEthBalance(w.address).then(setEth);
+    setAddress(w.publicKey);
+    supabase.from("profiles").update({ wallet_address: w.publicKey }).eq("id", user.id);
+    refreshBalance(w.publicKey);
 
     supabase
       .from("wallet_transactions")
@@ -47,8 +44,7 @@ export function WalletView() {
       .then(({ data }) => setTxs((data ?? []) as Tx[]));
   }, [user]);
 
-  const ethValue = eth * ETH_PRICE;
-  const total = ethValue + FAKE_ASSETS.reduce((a, b) => a + b.bal * b.price, 0);
+  const value = xlm * XLM_PRICE;
 
   const copyAddr = async () => {
     await navigator.clipboard.writeText(address);
@@ -57,21 +53,36 @@ export function WalletView() {
     setTimeout(() => setCopied(false), 1500);
   };
 
+  const onFund = async () => {
+    if (!address) return;
+    setFunding(true);
+    const ok = await fundTestnet(address);
+    if (ok) {
+      toast.success("Funded with 10,000 test XLM");
+      await refreshBalance(address);
+    } else {
+      toast.error("Funding failed");
+    }
+    setFunding(false);
+  };
+
   return (
     <div className="space-y-5">
       <div className="glass-strong relative overflow-hidden rounded-3xl p-6 shadow-soft">
         <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full opacity-50" style={{ background: "var(--gradient-peach)" }} />
-        <p className="relative text-xs uppercase tracking-widest text-muted-foreground">Total balance</p>
+        <div className="relative flex items-center gap-2">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">Total balance</p>
+          <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-foreground/5">{NETWORK_LABEL}</span>
+        </div>
         <h1 className="relative mt-2 text-4xl font-bold tracking-tight">
-          ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </h1>
-        <button onClick={copyAddr} className="relative mt-2 inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition">
+        <p className="relative mt-1 text-sm text-muted-foreground">{xlm.toLocaleString(undefined, { maximumFractionDigits: 4 })} XLM</p>
+        <button onClick={copyAddr} className="relative mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition">
           <span className="font-mono">{shortAddress(address)}</span>
           {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
         </button>
-        <div className="relative mt-1 inline-flex items-center gap-1 text-sm font-medium text-emerald-600 ml-3">
-          <TrendingUp className="h-4 w-4" /> Live
-        </div>
+
         <div className="relative mt-5 grid grid-cols-4 gap-2">
           {[
             { icon: ArrowUpRight, label: "Send", to: "/send" as const },
@@ -85,15 +96,23 @@ export function WalletView() {
             </Link>
           ))}
         </div>
+
+        {NETWORK_LABEL.includes("Testnet") && xlm === 0 && (
+          <button
+            onClick={onFund}
+            disabled={funding}
+            className="relative mt-4 inline-flex items-center gap-2 rounded-full bg-foreground text-background text-xs font-semibold px-4 py-2 disabled:opacity-50"
+          >
+            {funding ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            Fund testnet wallet
+          </button>
+        )}
       </div>
 
       <div>
         <h2 className="mb-3 text-lg font-bold px-1">Assets</h2>
         <div className="glass-strong rounded-3xl p-2 shadow-soft">
-          <AssetRow sym="ETH" name="Ethereum" price={ETH_PRICE} bal={eth} value={ethValue} change={0} color="from-indigo-400 to-violet-500" />
-          {FAKE_ASSETS.map((a) => (
-            <AssetRow key={a.sym} sym={a.sym} name={a.name} price={a.price} bal={a.bal} value={a.bal * a.price} change={a.change} color={a.color} />
-          ))}
+          <AssetRow sym="XLM" name="Stellar Lumens" price={XLM_PRICE} bal={xlm} value={value} change={0} color="from-fuchsia-400 to-violet-500" />
         </div>
       </div>
 
