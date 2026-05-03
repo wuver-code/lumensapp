@@ -9,11 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SendRouteImport } from './routes/send'
+import { Route as ReceiveRouteImport } from './routes/receive'
 import { Route as NewChatRouteImport } from './routes/new-chat'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChatIdRouteImport } from './routes/chat.$id'
 
+const SendRoute = SendRouteImport.update({
+  id: '/send',
+  path: '/send',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReceiveRoute = ReceiveRouteImport.update({
+  id: '/receive',
+  path: '/receive',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NewChatRoute = NewChatRouteImport.update({
   id: '/new-chat',
   path: '/new-chat',
@@ -39,12 +51,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/new-chat': typeof NewChatRoute
+  '/receive': typeof ReceiveRoute
+  '/send': typeof SendRoute
   '/chat/$id': typeof ChatIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/new-chat': typeof NewChatRoute
+  '/receive': typeof ReceiveRoute
+  '/send': typeof SendRoute
   '/chat/$id': typeof ChatIdRoute
 }
 export interface FileRoutesById {
@@ -52,25 +68,50 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/new-chat': typeof NewChatRoute
+  '/receive': typeof ReceiveRoute
+  '/send': typeof SendRoute
   '/chat/$id': typeof ChatIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/new-chat' | '/chat/$id'
+  fullPaths: '/' | '/auth' | '/new-chat' | '/receive' | '/send' | '/chat/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/new-chat' | '/chat/$id'
-  id: '__root__' | '/' | '/auth' | '/new-chat' | '/chat/$id'
+  to: '/' | '/auth' | '/new-chat' | '/receive' | '/send' | '/chat/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/new-chat'
+    | '/receive'
+    | '/send'
+    | '/chat/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   NewChatRoute: typeof NewChatRoute
+  ReceiveRoute: typeof ReceiveRoute
+  SendRoute: typeof SendRoute
   ChatIdRoute: typeof ChatIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/send': {
+      id: '/send'
+      path: '/send'
+      fullPath: '/send'
+      preLoaderRoute: typeof SendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/receive': {
+      id: '/receive'
+      path: '/receive'
+      fullPath: '/receive'
+      preLoaderRoute: typeof ReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/new-chat': {
       id: '/new-chat'
       path: '/new-chat'
@@ -106,8 +147,19 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   NewChatRoute: NewChatRoute,
+  ReceiveRoute: ReceiveRoute,
+  SendRoute: SendRoute,
   ChatIdRoute: ChatIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
