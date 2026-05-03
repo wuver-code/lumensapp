@@ -1,102 +1,149 @@
-import { ArrowDownLeft, ArrowUpRight, Repeat, ShoppingBag, TrendingUp, TrendingDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowDownLeft, ArrowUpRight, Repeat, ShoppingBag, TrendingUp, Copy, Check } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { getOrCreateWallet, getEthBalance, shortAddress } from "@/lib/wallet";
+import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 
-const assets = [
-  { sym: "BTC", name: "Bitcoin", price: 92840, change: 2.4, bal: 0.182, value: 16896, color: "from-amber-400 to-orange-500" },
-  { sym: "ETH", name: "Ethereum", price: 3420, change: -0.8, bal: 1.85, value: 6327, color: "from-indigo-400 to-violet-500" },
-  { sym: "USDC", name: "USD Coin", price: 1, change: 0.0, bal: 1240, value: 1240, color: "from-sky-400 to-blue-500" },
-  { sym: "SOL", name: "Solana", price: 184, change: 5.2, bal: 12.4, value: 2281, color: "from-fuchsia-400 to-pink-500" },
+const ETH_PRICE = 3420; // mocked spot for USD display
+const FAKE_ASSETS = [
+  { sym: "USDC", name: "USD Coin", price: 1, change: 0.0, bal: 0, color: "from-sky-400 to-blue-500" },
+  { sym: "BTC", name: "Bitcoin", price: 92840, change: 2.4, bal: 0, color: "from-amber-400 to-orange-500" },
 ];
 
-const txs = [
-  { type: "in", from: "Maya Chen", amt: "+0.05 ETH", usd: "$171.00", time: "2m" },
-  { type: "out", from: "Coffee shop", amt: "-12 USDC", usd: "$12.00", time: "1h" },
-  { type: "swap", from: "ETH → USDC", amt: "0.1 ETH", usd: "$342.00", time: "Yesterday" },
-];
+type Tx = {
+  id: string;
+  kind: string;
+  amount: number;
+  currency: string;
+  counterparty: string | null;
+  created_at: string;
+  status: string;
+};
 
 export function WalletView() {
-  const total = assets.reduce((a, b) => a + b.value, 0);
+  const { user } = useAuth();
+  const [eth, setEth] = useState(0);
+  const [address, setAddress] = useState<`0x${string}`>("0x0" as `0x${string}`);
+  const [copied, setCopied] = useState(false);
+  const [txs, setTxs] = useState<Tx[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    const w = getOrCreateWallet();
+    setAddress(w.address);
+    // persist wallet address to profile (idempotent)
+    supabase.from("profiles").update({ wallet_address: w.address }).eq("id", user.id);
+
+    getEthBalance(w.address).then(setEth);
+
+    supabase
+      .from("wallet_transactions")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(20)
+      .then(({ data }) => setTxs((data ?? []) as Tx[]));
+  }, [user]);
+
+  const ethValue = eth * ETH_PRICE;
+  const total = ethValue + FAKE_ASSETS.reduce((a, b) => a + b.bal * b.price, 0);
+
+  const copyAddr = async () => {
+    await navigator.clipboard.writeText(address);
+    setCopied(true);
+    toast.success("Address copied");
+    setTimeout(() => setCopied(false), 1500);
+  };
+
   return (
     <div className="space-y-5">
-      {/* Balance hero */}
       <div className="glass-strong relative overflow-hidden rounded-3xl p-6 shadow-soft">
-        <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full opacity-50"
-          style={{ background: "var(--gradient-peach)" }} />
+        <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full opacity-50" style={{ background: "var(--gradient-peach)" }} />
         <p className="relative text-xs uppercase tracking-widest text-muted-foreground">Total balance</p>
         <h1 className="relative mt-2 text-4xl font-bold tracking-tight">
-          ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </h1>
-        <div className="relative mt-1 inline-flex items-center gap-1 text-sm font-medium text-emerald-600">
-          <TrendingUp className="h-4 w-4" /> +$284.12 (1.2%) today
+        <button onClick={copyAddr} className="relative mt-2 inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition">
+          <span className="font-mono">{shortAddress(address)}</span>
+          {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+        </button>
+        <div className="relative mt-1 inline-flex items-center gap-1 text-sm font-medium text-emerald-600 ml-3">
+          <TrendingUp className="h-4 w-4" /> Live
         </div>
         <div className="relative mt-5 grid grid-cols-4 gap-2">
           {[
-            { icon: ArrowUpRight, label: "Send" },
-            { icon: ArrowDownLeft, label: "Receive" },
-            { icon: Repeat, label: "Swap" },
-            { icon: ShoppingBag, label: "Buy" },
-          ].map(({ icon: Icon, label }) => (
-            <button key={label} className="flex flex-col items-center gap-1.5 rounded-2xl bg-foreground/5 hover:bg-foreground hover:text-background py-3 transition">
+            { icon: ArrowUpRight, label: "Send", to: "/send" as const },
+            { icon: ArrowDownLeft, label: "Receive", to: "/receive" as const },
+            { icon: Repeat, label: "Swap", to: "/" as const },
+            { icon: ShoppingBag, label: "Buy", to: "/" as const },
+          ].map(({ icon: Icon, label, to }) => (
+            <Link key={label} to={to} className="flex flex-col items-center gap-1.5 rounded-2xl bg-foreground/5 hover:bg-foreground hover:text-background py-3 transition">
               <Icon className="h-4 w-4" />
               <span className="text-[11px] font-semibold">{label}</span>
-            </button>
+            </Link>
           ))}
         </div>
       </div>
 
-      {/* Assets */}
       <div>
-        <div className="mb-3 flex items-center justify-between px-1">
-          <h2 className="text-lg font-bold">Assets</h2>
-          <button className="text-xs font-medium text-muted-foreground hover:text-foreground">View all</button>
-        </div>
+        <h2 className="mb-3 text-lg font-bold px-1">Assets</h2>
         <div className="glass-strong rounded-3xl p-2 shadow-soft">
-          {assets.map((a) => (
-            <button key={a.sym} className="flex w-full items-center gap-3 rounded-2xl p-3 hover:bg-accent/40 transition">
-              <div className={`flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br ${a.color} text-xs font-bold text-white shadow-sm`}>
-                {a.sym}
-              </div>
-              <div className="flex-1 text-left">
-                <p className="font-semibold">{a.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {a.bal} {a.sym} · ${a.price.toLocaleString()}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="font-semibold">${a.value.toLocaleString()}</p>
-                <p className={`text-xs font-medium inline-flex items-center gap-0.5 ${a.change >= 0 ? "text-emerald-600" : "text-rose-500"}`}>
-                  {a.change >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                  {a.change >= 0 ? "+" : ""}{a.change}%
-                </p>
-              </div>
-            </button>
+          <AssetRow sym="ETH" name="Ethereum" price={ETH_PRICE} bal={eth} value={ethValue} change={0} color="from-indigo-400 to-violet-500" />
+          {FAKE_ASSETS.map((a) => (
+            <AssetRow key={a.sym} sym={a.sym} name={a.name} price={a.price} bal={a.bal} value={a.bal * a.price} change={a.change} color={a.color} />
           ))}
         </div>
       </div>
 
-      {/* Recent activity */}
       <div>
-        <div className="mb-3 flex items-center justify-between px-1">
-          <h2 className="text-lg font-bold">Recent activity</h2>
-        </div>
+        <h2 className="mb-3 text-lg font-bold px-1">Recent activity</h2>
         <div className="glass-strong rounded-3xl p-2 shadow-soft">
-          {txs.map((t, i) => (
-            <div key={i} className="flex items-center gap-3 p-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground/5">
-                {t.type === "in" ? <ArrowDownLeft className="h-4 w-4 text-emerald-600" /> :
-                 t.type === "out" ? <ArrowUpRight className="h-4 w-4 text-rose-500" /> :
-                 <Repeat className="h-4 w-4 text-violet-500" />}
+          {txs.length === 0 ? (
+            <div className="p-6 text-center text-sm text-muted-foreground">No activity yet.</div>
+          ) : (
+            txs.map((t) => (
+              <div key={t.id} className="flex items-center gap-3 p-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground/5">
+                  {t.kind === "receive" ? <ArrowDownLeft className="h-4 w-4 text-emerald-600" /> :
+                   t.kind === "send" ? <ArrowUpRight className="h-4 w-4 text-rose-500" /> :
+                   <Repeat className="h-4 w-4 text-violet-500" />}
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-sm capitalize">{t.kind} {t.counterparty ? `· ${shortAddress(t.counterparty)}` : ""}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleString()}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-sm">{t.kind === "send" ? "-" : "+"}{t.amount} {t.currency}</p>
+                  <p className="text-xs text-muted-foreground capitalize">{t.status}</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="font-medium text-sm">{t.from}</p>
-                <p className="text-xs text-muted-foreground">{t.time}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-semibold text-sm">{t.amt}</p>
-                <p className="text-xs text-muted-foreground">{t.usd}</p>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function AssetRow({ sym, name, price, bal, value, change, color }: any) {
+  return (
+    <div className="flex w-full items-center gap-3 rounded-2xl p-3">
+      <div className={`flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br ${color} text-xs font-bold text-white shadow-sm`}>
+        {sym}
+      </div>
+      <div className="flex-1 text-left">
+        <p className="font-semibold">{name}</p>
+        <p className="text-xs text-muted-foreground">{bal.toFixed(4)} {sym} · ${price.toLocaleString()}</p>
+      </div>
+      <div className="text-right">
+        <p className="font-semibold">${value.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+        {change !== 0 && (
+          <p className={`text-xs font-medium ${change >= 0 ? "text-emerald-600" : "text-rose-500"}`}>
+            {change >= 0 ? "+" : ""}{change}%
+          </p>
+        )}
       </div>
     </div>
   );
