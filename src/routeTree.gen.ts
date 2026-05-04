@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SendRouteImport } from './routes/send'
 import { Route as ReceiveRouteImport } from './routes/receive'
 import { Route as NewChatRouteImport } from './routes/new-chat'
+import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TxHashRouteImport } from './routes/tx.$hash'
 import { Route as ChatIdRouteImport } from './routes/chat.$id'
 
 const SendRoute = SendRouteImport.update({
@@ -31,6 +33,11 @@ const NewChatRoute = NewChatRouteImport.update({
   path: '/new-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactsRoute = ContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -39,6 +46,11 @@ const AuthRoute = AuthRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TxHashRoute = TxHashRouteImport.update({
+  id: '/tx/$hash',
+  path: '/tx/$hash',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChatIdRoute = ChatIdRouteImport.update({
@@ -50,50 +62,76 @@ const ChatIdRoute = ChatIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/contacts': typeof ContactsRoute
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
   '/chat/$id': typeof ChatIdRoute
+  '/tx/$hash': typeof TxHashRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/contacts': typeof ContactsRoute
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
   '/chat/$id': typeof ChatIdRoute
+  '/tx/$hash': typeof TxHashRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/contacts': typeof ContactsRoute
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
   '/chat/$id': typeof ChatIdRoute
+  '/tx/$hash': typeof TxHashRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/new-chat' | '/receive' | '/send' | '/chat/$id'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/new-chat' | '/receive' | '/send' | '/chat/$id'
-  id:
-    | '__root__'
+  fullPaths:
     | '/'
     | '/auth'
+    | '/contacts'
     | '/new-chat'
     | '/receive'
     | '/send'
     | '/chat/$id'
+    | '/tx/$hash'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/auth'
+    | '/contacts'
+    | '/new-chat'
+    | '/receive'
+    | '/send'
+    | '/chat/$id'
+    | '/tx/$hash'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/contacts'
+    | '/new-chat'
+    | '/receive'
+    | '/send'
+    | '/chat/$id'
+    | '/tx/$hash'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  ContactsRoute: typeof ContactsRoute
   NewChatRoute: typeof NewChatRoute
   ReceiveRoute: typeof ReceiveRoute
   SendRoute: typeof SendRoute
   ChatIdRoute: typeof ChatIdRoute
+  TxHashRoute: typeof TxHashRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -119,6 +157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contacts': {
+      id: '/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof ContactsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -131,6 +176,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tx/$hash': {
+      id: '/tx/$hash'
+      path: '/tx/$hash'
+      fullPath: '/tx/$hash'
+      preLoaderRoute: typeof TxHashRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chat/$id': {
@@ -146,10 +198,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  ContactsRoute: ContactsRoute,
   NewChatRoute: NewChatRoute,
   ReceiveRoute: ReceiveRoute,
   SendRoute: SendRoute,
   ChatIdRoute: ChatIdRoute,
+  TxHashRoute: TxHashRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
