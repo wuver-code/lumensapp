@@ -141,6 +141,36 @@ export type Database = {
         }
         Relationships: []
       }
+      stellar_contacts: {
+        Row: {
+          address: string
+          created_at: string
+          id: string
+          is_favorite: boolean
+          label: string
+          memo: string | null
+          user_id: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          label: string
+          memo?: string | null
+          user_id: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          label?: string
+          memo?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       wallet_transactions: {
         Row: {
           amount: number
