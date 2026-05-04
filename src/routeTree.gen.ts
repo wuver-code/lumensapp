@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrustlinesRouteImport } from './routes/trustlines'
 import { Route as SendRouteImport } from './routes/send'
 import { Route as ReceiveRouteImport } from './routes/receive'
 import { Route as NewChatRouteImport } from './routes/new-chat'
@@ -18,6 +19,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TxHashRouteImport } from './routes/tx.$hash'
 import { Route as ChatIdRouteImport } from './routes/chat.$id'
 
+const TrustlinesRoute = TrustlinesRouteImport.update({
+  id: '/trustlines',
+  path: '/trustlines',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SendRoute = SendRouteImport.update({
   id: '/send',
   path: '/send',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
+  '/trustlines': typeof TrustlinesRoute
   '/chat/$id': typeof ChatIdRoute
   '/tx/$hash': typeof TxHashRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
+  '/trustlines': typeof TrustlinesRoute
   '/chat/$id': typeof ChatIdRoute
   '/tx/$hash': typeof TxHashRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
+  '/trustlines': typeof TrustlinesRoute
   '/chat/$id': typeof ChatIdRoute
   '/tx/$hash': typeof TxHashRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/new-chat'
     | '/receive'
     | '/send'
+    | '/trustlines'
     | '/chat/$id'
     | '/tx/$hash'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/new-chat'
     | '/receive'
     | '/send'
+    | '/trustlines'
     | '/chat/$id'
     | '/tx/$hash'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/new-chat'
     | '/receive'
     | '/send'
+    | '/trustlines'
     | '/chat/$id'
     | '/tx/$hash'
   fileRoutesById: FileRoutesById
@@ -130,12 +142,20 @@ export interface RootRouteChildren {
   NewChatRoute: typeof NewChatRoute
   ReceiveRoute: typeof ReceiveRoute
   SendRoute: typeof SendRoute
+  TrustlinesRoute: typeof TrustlinesRoute
   ChatIdRoute: typeof ChatIdRoute
   TxHashRoute: typeof TxHashRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trustlines': {
+      id: '/trustlines'
+      path: '/trustlines'
+      fullPath: '/trustlines'
+      preLoaderRoute: typeof TrustlinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/send': {
       id: '/send'
       path: '/send'
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   NewChatRoute: NewChatRoute,
   ReceiveRoute: ReceiveRoute,
   SendRoute: SendRoute,
+  TrustlinesRoute: TrustlinesRoute,
   ChatIdRoute: ChatIdRoute,
   TxHashRoute: TxHashRoute,
 }
