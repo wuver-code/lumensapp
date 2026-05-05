@@ -59,13 +59,7 @@ export function ChatList() {
             .from("conversation_members")
             .select("user_id, profile:profiles(display_name, avatar_url)")
             .eq("conversation_id", c.id);
-          const { data: last } = await supabase
-            .from("messages")
-            .select("content, kind")
-            .eq("conversation_id", c.id)
-            .order("created_at", { ascending: false })
-            .limit(1);
-          return { ...c, members: (members ?? []) as any, last: (last ?? []) as any };
+          return { ...c, members: (members ?? []) as any, last: [] as any };
         })
       );
       if (active) { setRows(enriched); setLoading(false); }
@@ -73,8 +67,8 @@ export function ChatList() {
     load();
 
     const ch = supabase
-      .channel("messages-list")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => load())
+      .channel("conv-list")
+      .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, () => load())
       .subscribe();
     return () => {
       active = false;
@@ -92,9 +86,8 @@ export function ChatList() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Chats</h1>
-        <Link to="/new-chat" className="glass flex h-10 w-10 items-center justify-center rounded-full hover:bg-foreground hover:text-background transition">
+      <div className="flex items-center justify-end">
+        <Link to="/find" className="glass flex h-10 w-10 items-center justify-center rounded-full hover:bg-foreground hover:text-background transition">
           <Plus className="h-4 w-4" />
         </Link>
       </div>
@@ -115,20 +108,15 @@ export function ChatList() {
           <MessageCircle className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
           <p className="font-semibold">No conversations yet</p>
           <p className="text-sm text-muted-foreground mt-1 mb-4">Start a chat to send your first message or payment.</p>
-          <Link to="/new-chat" className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold">
-            <Plus className="h-4 w-4" /> New chat
+          <Link to="/find" className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold">
+            <Plus className="h-4 w-4" /> Find people
           </Link>
         </div>
       ) : (
         <div className="glass-strong rounded-3xl p-2 shadow-soft">
           {filtered.map((c) => {
             const name = display(c);
-            const last = c.last[0];
-            const preview = !last
-              ? "Say hi 👋"
-              : last.kind === "payment"
-              ? "💸 Payment"
-              : last.content ?? "";
+            const preview = "🔒 End-to-end encrypted";
             return (
               <Link
                 key={c.id}

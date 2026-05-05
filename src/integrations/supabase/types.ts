@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_requests: {
+        Row: {
+          created_at: string
+          from_user: string
+          id: string
+          status: string
+          to_user: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          from_user: string
+          id?: string
+          status?: string
+          to_user: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          from_user?: string
+          id?: string
+          status?: string
+          to_user?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       conversation_members: {
         Row: {
           conversation_id: string
@@ -117,6 +144,8 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          phone: string | null
+          public_key: string | null
           updated_at: string
           username: string | null
           wallet_address: string | null
@@ -126,6 +155,8 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          phone?: string | null
+          public_key?: string | null
           updated_at?: string
           username?: string | null
           wallet_address?: string | null
@@ -135,6 +166,8 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          phone?: string | null
+          public_key?: string | null
           updated_at?: string
           username?: string | null
           wallet_address?: string | null
@@ -212,9 +245,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      are_contacts: { Args: { _a: string; _b: string }; Returns: boolean }
+      find_by_phones: {
+        Args: { _phones: string[] }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          id: string
+          phone: string
+          username: string
+        }[]
+      }
       is_conversation_member: {
         Args: { _conv: string; _user: string }
         Returns: boolean
+      }
+      search_profile: {
+        Args: { _q: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          id: string
+          phone: string
+          username: string
+          wallet_address: string
+        }[]
       }
     }
     Enums: {
