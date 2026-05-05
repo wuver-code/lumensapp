@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrustlinesRouteImport } from './routes/trustlines'
 import { Route as SendRouteImport } from './routes/send'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ReceiveRouteImport } from './routes/receive'
 import { Route as NewChatRouteImport } from './routes/new-chat'
+import { Route as FindRouteImport } from './routes/find'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
@@ -29,6 +31,11 @@ const SendRoute = SendRouteImport.update({
   path: '/send',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReceiveRoute = ReceiveRouteImport.update({
   id: '/receive',
   path: '/receive',
@@ -37,6 +44,11 @@ const ReceiveRoute = ReceiveRouteImport.update({
 const NewChatRoute = NewChatRouteImport.update({
   id: '/new-chat',
   path: '/new-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FindRoute = FindRouteImport.update({
+  id: '/find',
+  path: '/find',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactsRoute = ContactsRouteImport.update({
@@ -69,8 +81,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/contacts': typeof ContactsRoute
+  '/find': typeof FindRoute
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/send': typeof SendRoute
   '/trustlines': typeof TrustlinesRoute
   '/chat/$id': typeof ChatIdRoute
@@ -80,8 +94,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/contacts': typeof ContactsRoute
+  '/find': typeof FindRoute
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/send': typeof SendRoute
   '/trustlines': typeof TrustlinesRoute
   '/chat/$id': typeof ChatIdRoute
@@ -92,8 +108,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/contacts': typeof ContactsRoute
+  '/find': typeof FindRoute
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/send': typeof SendRoute
   '/trustlines': typeof TrustlinesRoute
   '/chat/$id': typeof ChatIdRoute
@@ -105,8 +123,10 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/contacts'
+    | '/find'
     | '/new-chat'
     | '/receive'
+    | '/reset-password'
     | '/send'
     | '/trustlines'
     | '/chat/$id'
@@ -116,8 +136,10 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/contacts'
+    | '/find'
     | '/new-chat'
     | '/receive'
+    | '/reset-password'
     | '/send'
     | '/trustlines'
     | '/chat/$id'
@@ -127,8 +149,10 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/contacts'
+    | '/find'
     | '/new-chat'
     | '/receive'
+    | '/reset-password'
     | '/send'
     | '/trustlines'
     | '/chat/$id'
@@ -139,8 +163,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   ContactsRoute: typeof ContactsRoute
+  FindRoute: typeof FindRoute
   NewChatRoute: typeof NewChatRoute
   ReceiveRoute: typeof ReceiveRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SendRoute: typeof SendRoute
   TrustlinesRoute: typeof TrustlinesRoute
   ChatIdRoute: typeof ChatIdRoute
@@ -163,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SendRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/receive': {
       id: '/receive'
       path: '/receive'
@@ -175,6 +208,13 @@ declare module '@tanstack/react-router' {
       path: '/new-chat'
       fullPath: '/new-chat'
       preLoaderRoute: typeof NewChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/find': {
+      id: '/find'
+      path: '/find'
+      fullPath: '/find'
+      preLoaderRoute: typeof FindRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contacts': {
@@ -219,8 +259,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   ContactsRoute: ContactsRoute,
+  FindRoute: FindRoute,
   NewChatRoute: NewChatRoute,
   ReceiveRoute: ReceiveRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SendRoute: SendRoute,
   TrustlinesRoute: TrustlinesRoute,
   ChatIdRoute: ChatIdRoute,
@@ -229,3 +271,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
