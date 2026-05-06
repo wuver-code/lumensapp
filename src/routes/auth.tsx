@@ -123,15 +123,35 @@ function AuthPage() {
 
           <form onSubmit={handleSubmit} className="space-y-3">
             {mode === "signup" && (
-              <Field icon={UserIcon}>
-                <input
-                  required
-                  placeholder="Display name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="flex-1 bg-transparent text-sm outline-none"
-                />
-              </Field>
+              <>
+                <Field icon={UserIcon}>
+                  <input
+                    required
+                    placeholder="Display name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="flex-1 bg-transparent text-sm outline-none"
+                  />
+                </Field>
+                <Field icon={AtSign}>
+                  <input
+                    placeholder="Username (optional, for search)"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.replace(/\s+/g, "").toLowerCase())}
+                    maxLength={30}
+                    className="flex-1 bg-transparent text-sm outline-none"
+                  />
+                </Field>
+                <Field icon={Phone}>
+                  <input
+                    type="tel"
+                    placeholder="+1 555 123 4567 (optional, for contact discovery)"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="flex-1 bg-transparent text-sm outline-none"
+                  />
+                </Field>
+              </>
             )}
 
             {mode !== "otp" || !otpSent ? (
