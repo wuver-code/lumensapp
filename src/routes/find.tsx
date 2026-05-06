@@ -168,11 +168,14 @@ function Find() {
           <h2 className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Requests</h2>
           <div className="glass-strong rounded-3xl p-2">
             {incoming.map((r) => (
-              <div key={r.id} className="flex items-center gap-3 p-3">
+              <div key={r.id} className="flex items-start gap-3 p-3">
                 <Avatar name={r.profile?.display_name ?? "?"} />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold truncate">{r.profile?.display_name ?? "Someone"}</p>
                   <p className="text-xs text-muted-foreground truncate">@{r.profile?.username ?? r.profile?.phone ?? ""}</p>
+                  {(r as any).message && (
+                    <p className="mt-1 text-xs italic text-foreground/80 break-words">"{(r as any).message}"</p>
+                  )}
                 </div>
                 <button onClick={() => respond(r, "accepted")} className="h-9 w-9 rounded-full bg-foreground text-background flex items-center justify-center"><Check className="h-4 w-4" /></button>
                 <button onClick={() => respond(r, "declined")} className="h-9 w-9 rounded-full glass flex items-center justify-center"><X className="h-4 w-4" /></button>
