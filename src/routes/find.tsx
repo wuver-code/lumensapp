@@ -34,6 +34,8 @@ function Find() {
   const [incoming, setIncoming] = useState<Req[]>([]);
   const [outgoing, setOutgoing] = useState<Req[]>([]);
   const [contacts, setContacts] = useState<Profile[]>([]);
+  const [requestTarget, setRequestTarget] = useState<Profile | null>(null);
+  const [requestNote, setRequestNote] = useState("");
 
   const load = async () => {
     if (!user) return;
@@ -66,7 +68,20 @@ function Find() {
     );
   };
 
-  useEffect(() => { load(); }, [user]);
+  useEffect(() => {
+    if (!user) return;
+    load();
+    // Instant realtime updates so requests appear in <1s on both sides
+    const ch = supabase
+      .channel(`contact-requests-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "contact_requests" },
+        () => load(),
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user]);
 
   const search = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -95,13 +110,21 @@ function Find() {
     if (!data?.length) toast("No matches on Lumens yet.");
   };
 
-  const sendRequest = async (toId: string) => {
-    if (!user) return;
+  const openRequest = (p: Profile) => {
+    setRequestTarget(p);
+    setRequestNote("");
+  };
+
+  const submitRequest = async () => {
+    if (!user || !requestTarget) return;
+    const note = requestNote.trim().slice(0, 280) || null;
     const { error } = await supabase
       .from("contact_requests")
-      .insert({ from_user: user.id, to_user: toId, status: "pending" });
+      .insert({ from_user: user.id, to_user: requestTarget.id, status: "pending", message: note });
     if (error) return toast.error(error.message);
     toast.success("Request sent");
+    setRequestTarget(null);
+    setRequestNote("");
     load();
   };
 
