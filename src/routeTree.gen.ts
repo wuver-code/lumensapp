@@ -14,6 +14,7 @@ import { Route as SendRouteImport } from './routes/send'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ReceiveRouteImport } from './routes/receive'
 import { Route as NewChatRouteImport } from './routes/new-chat'
+import { Route as KeysRouteImport } from './routes/keys'
 import { Route as FindRouteImport } from './routes/find'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -44,6 +45,11 @@ const ReceiveRoute = ReceiveRouteImport.update({
 const NewChatRoute = NewChatRouteImport.update({
   id: '/new-chat',
   path: '/new-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KeysRoute = KeysRouteImport.update({
+  id: '/keys',
+  path: '/keys',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FindRoute = FindRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/contacts': typeof ContactsRoute
   '/find': typeof FindRoute
+  '/keys': typeof KeysRoute
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/contacts': typeof ContactsRoute
   '/find': typeof FindRoute
+  '/keys': typeof KeysRoute
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/contacts': typeof ContactsRoute
   '/find': typeof FindRoute
+  '/keys': typeof KeysRoute
   '/new-chat': typeof NewChatRoute
   '/receive': typeof ReceiveRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contacts'
     | '/find'
+    | '/keys'
     | '/new-chat'
     | '/receive'
     | '/reset-password'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contacts'
     | '/find'
+    | '/keys'
     | '/new-chat'
     | '/receive'
     | '/reset-password'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contacts'
     | '/find'
+    | '/keys'
     | '/new-chat'
     | '/receive'
     | '/reset-password'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ContactsRoute: typeof ContactsRoute
   FindRoute: typeof FindRoute
+  KeysRoute: typeof KeysRoute
   NewChatRoute: typeof NewChatRoute
   ReceiveRoute: typeof ReceiveRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/new-chat'
       fullPath: '/new-chat'
       preLoaderRoute: typeof NewChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/keys': {
+      id: '/keys'
+      path: '/keys'
+      fullPath: '/keys'
+      preLoaderRoute: typeof KeysRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/find': {
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ContactsRoute: ContactsRoute,
   FindRoute: FindRoute,
+  KeysRoute: KeysRoute,
   NewChatRoute: NewChatRoute,
   ReceiveRoute: ReceiveRoute,
   ResetPasswordRoute: ResetPasswordRoute,
