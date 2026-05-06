@@ -15,6 +15,8 @@ function ChatRoom() {
   const [text, setText] = useState("");
   const [peerKey, setPeerKey] = useState<string | null>(null);
   const [peerName, setPeerName] = useState("Conversation");
+  const [peerId, setPeerId] = useState<string | null>(null);
+  const [isAcceptedContact, setIsAcceptedContact] = useState(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
