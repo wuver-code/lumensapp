@@ -259,6 +259,30 @@ function Find() {
           </div>
         )}
       </section>
+      {requestTarget && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 px-4" onClick={() => setRequestTarget(null)}>
+          <div className="w-full max-w-sm glass-strong rounded-3xl p-5 space-y-3" onClick={(e) => e.stopPropagation()}>
+            <p className="font-semibold">Send request to {requestTarget.display_name ?? requestTarget.username}</p>
+            <textarea
+              autoFocus
+              rows={3}
+              maxLength={280}
+              value={requestNote}
+              onChange={(e) => setRequestNote(e.target.value)}
+              placeholder="Optional message — say why you're connecting"
+              className="w-full bg-foreground/5 rounded-2xl px-3 py-2 text-sm outline-none resize-none"
+            />
+            <div className="flex justify-between text-[11px] text-muted-foreground">
+              <span>Visible only to {requestTarget.display_name ?? "them"}</span>
+              <span>{requestNote.length}/280</span>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setRequestTarget(null)} className="flex-1 rounded-full glass py-2 text-sm font-semibold">Cancel</button>
+              <button onClick={submitRequest} className="flex-1 rounded-full bg-foreground text-background py-2 text-sm font-semibold">Send request</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
