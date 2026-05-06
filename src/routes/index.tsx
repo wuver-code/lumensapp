@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { ensureKeypair } from "@/lib/crypto";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/lumens-logo.png";
-import { LogOut, UserPlus } from "lucide-react";
+import { LogOut, UserPlus, KeyRound } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -24,6 +24,7 @@ function Home() {
   const [mode, setMode] = useState<Mode>("chat");
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -36,6 +37,25 @@ function Home() {
       const { publicKey } = await ensureKeypair();
       await supabase.from("profiles").update({ public_key: publicKey }).eq("id", user.id);
     })();
+  }, [user]);
+
+  // Pending incoming contact requests + instant realtime updates
+  useEffect(() => {
+    if (!user) return;
+    const refresh = async () => {
+      const { count } = await supabase
+        .from("contact_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("to_user", user.id)
+        .eq("status", "pending");
+      setPendingCount(count ?? 0);
+    };
+    refresh();
+    const ch = supabase
+      .channel(`pending-reqs-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "contact_requests" }, () => refresh())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, [user]);
 
   if (loading || !user) {
