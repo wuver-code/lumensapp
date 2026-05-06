@@ -35,16 +35,19 @@ function ChatRoom() {
         .from("conversation_members")
         .select("user_id")
         .eq("conversation_id", id);
-      const peerId = (members ?? []).map((m) => m.user_id).find((u) => u !== user.id);
-      if (!peerId) return;
+      const peerIdLocal = (members ?? []).map((m) => m.user_id).find((u) => u !== user.id);
+      if (!peerIdLocal) return;
+      setPeerId(peerIdLocal);
       const { data: peer } = await supabase
         .from("profiles")
         .select("display_name, public_key")
-        .eq("id", peerId)
+        .eq("id", peerIdLocal)
         .maybeSingle();
       if (cancelled) return;
       setPeerName(peer?.display_name ?? "Conversation");
       setPeerKey(peer?.public_key ?? null);
+      const { data: accepted } = await supabase.rpc("are_contacts", { _a: user.id, _b: peerIdLocal });
+      if (!cancelled) setIsAcceptedContact(Boolean(accepted));
 
       const ch = supabase
         .channel(`e2ee-${id}`, { config: { broadcast: { self: false } } })
