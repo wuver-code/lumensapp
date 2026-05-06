@@ -233,7 +233,7 @@ function Find() {
                 ) : isPending(p.id) ? (
                   <span className="text-xs text-muted-foreground">Pending</span>
                 ) : (
-                  <button onClick={() => sendRequest(p.id)} className="rounded-full glass px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1">
+                  <button onClick={() => openRequest(p)} className="rounded-full glass px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1">
                     <UserPlus className="h-3.5 w-3.5" /> Request
                   </button>
                 )}
