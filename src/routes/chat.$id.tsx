@@ -15,6 +15,8 @@ function ChatRoom() {
   const [text, setText] = useState("");
   const [peerKey, setPeerKey] = useState<string | null>(null);
   const [peerName, setPeerName] = useState("Conversation");
+  const [peerId, setPeerId] = useState<string | null>(null);
+  const [isAcceptedContact, setIsAcceptedContact] = useState(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -33,16 +35,19 @@ function ChatRoom() {
         .from("conversation_members")
         .select("user_id")
         .eq("conversation_id", id);
-      const peerId = (members ?? []).map((m) => m.user_id).find((u) => u !== user.id);
-      if (!peerId) return;
+      const peerIdLocal = (members ?? []).map((m) => m.user_id).find((u) => u !== user.id);
+      if (!peerIdLocal) return;
+      setPeerId(peerIdLocal);
       const { data: peer } = await supabase
         .from("profiles")
         .select("display_name, public_key")
-        .eq("id", peerId)
+        .eq("id", peerIdLocal)
         .maybeSingle();
       if (cancelled) return;
       setPeerName(peer?.display_name ?? "Conversation");
       setPeerKey(peer?.public_key ?? null);
+      const { data: accepted } = await supabase.rpc("are_contacts", { _a: user.id, _b: peerIdLocal });
+      if (!cancelled) setIsAcceptedContact(Boolean(accepted));
 
       const ch = supabase
         .channel(`e2ee-${id}`, { config: { broadcast: { self: false } } })
@@ -78,7 +83,7 @@ function ChatRoom() {
   const send = async (e: React.FormEvent) => {
     e.preventDefault();
     const content = text.trim();
-    if (!content || !user || !peerKey || !channelRef.current) return;
+    if (!content || !user || !peerKey || !channelRef.current || !isAcceptedContact) return;
     setText("");
     const { iv, ct } = await encryptFor(peerKey, content);
     const msg: LocalMessage = {
@@ -105,8 +110,13 @@ function ChatRoom() {
         <Link to="/" className="text-muted-foreground"><ArrowLeft className="h-5 w-5" /></Link>
         <div className="flex-1 min-w-0">
           <h1 className="font-bold truncate">{peerName}</h1>
-          <p className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
-            <ShieldCheck className="h-3 w-3" /> End-to-end encrypted · device only
+          <p className="text-[11px] inline-flex items-center gap-1.5 mt-0.5">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 font-semibold">
+              <ShieldCheck className="h-3 w-3" /> Encrypted (device-only)
+            </span>
+            {!isAcceptedContact && peerId && (
+              <span className="text-amber-600 dark:text-amber-400">· not yet a contact</span>
+            )}
           </p>
         </div>
       </header>
@@ -115,6 +125,17 @@ function ChatRoom() {
           <p className="text-center text-xs text-muted-foreground py-8">
             Waiting for the other person to open Lumens to exchange keys…
           </p>
+        )}
+        {!isAcceptedContact && peerId && (
+          <div className="glass-strong rounded-2xl p-4 text-center text-sm">
+            <p className="font-semibold mb-1">Sending is locked</p>
+            <p className="text-xs text-muted-foreground mb-3">
+              You can only send messages once {peerName} accepts your contact request.
+            </p>
+            <Link to="/find" className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-3 py-1.5 text-xs font-semibold">
+              Manage requests
+            </Link>
+          </div>
         )}
         {msgs.map((m) => {
           const mine = m.senderId === user?.id;
@@ -132,11 +153,11 @@ function ChatRoom() {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={peerKey ? "Encrypted message…" : "Waiting for keys…"}
-          disabled={!peerKey}
+          placeholder={!isAcceptedContact ? "Locked — accept contact first" : peerKey ? "Encrypted message…" : "Waiting for keys…"}
+          disabled={!peerKey || !isAcceptedContact}
           className="flex-1 bg-foreground/5 rounded-full px-4 py-2.5 text-sm outline-none disabled:opacity-60"
         />
-        <button type="submit" disabled={!peerKey} className="h-10 w-10 rounded-full bg-foreground text-background flex items-center justify-center disabled:opacity-50">
+        <button type="submit" disabled={!peerKey || !isAcceptedContact} className="h-10 w-10 rounded-full bg-foreground text-background flex items-center justify-center disabled:opacity-50">
           <Send className="h-4 w-4" />
         </button>
       </form>

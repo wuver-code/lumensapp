@@ -60,3 +60,25 @@ export async function decryptFrom(theirPubJwk: string, payload: { iv: string; ct
   );
   return new TextDecoder().decode(pt);
 }
+
+// ---- Backup / restore the device keypair so users can move between devices ----
+
+export function exportKeypairBackup(): string {
+  const pub = localStorage.getItem(PUB_KEY);
+  const priv = localStorage.getItem(PRIV_KEY);
+  if (!pub || !priv) throw new Error("No keypair on this device yet.");
+  return JSON.stringify({ v: 1, kind: "lumens-e2ee-backup", pub, priv }, null, 2);
+}
+
+export async function importKeypairBackup(json: string): Promise<{ publicKey: string }> {
+  const parsed = JSON.parse(json);
+  if (parsed?.kind !== "lumens-e2ee-backup" || !parsed.pub || !parsed.priv) {
+    throw new Error("This file is not a valid Lumens key backup.");
+  }
+  // Validate by importing
+  await importPriv(parsed.priv);
+  await importPub(parsed.pub);
+  localStorage.setItem(PRIV_KEY, parsed.priv);
+  localStorage.setItem(PUB_KEY, parsed.pub);
+  return { publicKey: parsed.pub };
+}

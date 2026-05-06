@@ -34,6 +34,8 @@ function Find() {
   const [incoming, setIncoming] = useState<Req[]>([]);
   const [outgoing, setOutgoing] = useState<Req[]>([]);
   const [contacts, setContacts] = useState<Profile[]>([]);
+  const [requestTarget, setRequestTarget] = useState<Profile | null>(null);
+  const [requestNote, setRequestNote] = useState("");
 
   const load = async () => {
     if (!user) return;
@@ -66,7 +68,20 @@ function Find() {
     );
   };
 
-  useEffect(() => { load(); }, [user]);
+  useEffect(() => {
+    if (!user) return;
+    load();
+    // Instant realtime updates so requests appear in <1s on both sides
+    const ch = supabase
+      .channel(`contact-requests-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "contact_requests" },
+        () => load(),
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user]);
 
   const search = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -95,13 +110,21 @@ function Find() {
     if (!data?.length) toast("No matches on Lumens yet.");
   };
 
-  const sendRequest = async (toId: string) => {
-    if (!user) return;
+  const openRequest = (p: Profile) => {
+    setRequestTarget(p);
+    setRequestNote("");
+  };
+
+  const submitRequest = async () => {
+    if (!user || !requestTarget) return;
+    const note = requestNote.trim().slice(0, 280) || null;
     const { error } = await supabase
       .from("contact_requests")
-      .insert({ from_user: user.id, to_user: toId, status: "pending" });
+      .insert({ from_user: user.id, to_user: requestTarget.id, status: "pending", message: note });
     if (error) return toast.error(error.message);
     toast.success("Request sent");
+    setRequestTarget(null);
+    setRequestNote("");
     load();
   };
 
@@ -145,11 +168,14 @@ function Find() {
           <h2 className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Requests</h2>
           <div className="glass-strong rounded-3xl p-2">
             {incoming.map((r) => (
-              <div key={r.id} className="flex items-center gap-3 p-3">
+              <div key={r.id} className="flex items-start gap-3 p-3">
                 <Avatar name={r.profile?.display_name ?? "?"} />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold truncate">{r.profile?.display_name ?? "Someone"}</p>
                   <p className="text-xs text-muted-foreground truncate">@{r.profile?.username ?? r.profile?.phone ?? ""}</p>
+                  {(r as any).message && (
+                    <p className="mt-1 text-xs italic text-foreground/80 break-words">"{(r as any).message}"</p>
+                  )}
                 </div>
                 <button onClick={() => respond(r, "accepted")} className="h-9 w-9 rounded-full bg-foreground text-background flex items-center justify-center"><Check className="h-4 w-4" /></button>
                 <button onClick={() => respond(r, "declined")} className="h-9 w-9 rounded-full glass flex items-center justify-center"><X className="h-4 w-4" /></button>
@@ -207,7 +233,7 @@ function Find() {
                 ) : isPending(p.id) ? (
                   <span className="text-xs text-muted-foreground">Pending</span>
                 ) : (
-                  <button onClick={() => sendRequest(p.id)} className="rounded-full glass px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1">
+                  <button onClick={() => openRequest(p)} className="rounded-full glass px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1">
                     <UserPlus className="h-3.5 w-3.5" /> Request
                   </button>
                 )}
@@ -233,6 +259,30 @@ function Find() {
           </div>
         )}
       </section>
+      {requestTarget && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 px-4" onClick={() => setRequestTarget(null)}>
+          <div className="w-full max-w-sm glass-strong rounded-3xl p-5 space-y-3" onClick={(e) => e.stopPropagation()}>
+            <p className="font-semibold">Send request to {requestTarget.display_name ?? requestTarget.username}</p>
+            <textarea
+              autoFocus
+              rows={3}
+              maxLength={280}
+              value={requestNote}
+              onChange={(e) => setRequestNote(e.target.value)}
+              placeholder="Optional message — say why you're connecting"
+              className="w-full bg-foreground/5 rounded-2xl px-3 py-2 text-sm outline-none resize-none"
+            />
+            <div className="flex justify-between text-[11px] text-muted-foreground">
+              <span>Visible only to {requestTarget.display_name ?? "them"}</span>
+              <span>{requestNote.length}/280</span>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setRequestTarget(null)} className="flex-1 rounded-full glass py-2 text-sm font-semibold">Cancel</button>
+              <button onClick={submitRequest} className="flex-1 rounded-full bg-foreground text-background py-2 text-sm font-semibold">Send request</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

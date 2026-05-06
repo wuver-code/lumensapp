@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { ensureKeypair } from "@/lib/crypto";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/lumens-logo.png";
-import { LogOut, UserPlus } from "lucide-react";
+import { LogOut, UserPlus, KeyRound } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -24,6 +24,7 @@ function Home() {
   const [mode, setMode] = useState<Mode>("chat");
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -36,6 +37,25 @@ function Home() {
       const { publicKey } = await ensureKeypair();
       await supabase.from("profiles").update({ public_key: publicKey }).eq("id", user.id);
     })();
+  }, [user]);
+
+  // Pending incoming contact requests + instant realtime updates
+  useEffect(() => {
+    if (!user) return;
+    const refresh = async () => {
+      const { count } = await supabase
+        .from("contact_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("to_user", user.id)
+        .eq("status", "pending");
+      setPendingCount(count ?? 0);
+    };
+    refresh();
+    const ch = supabase
+      .channel(`pending-reqs-${user.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "contact_requests" }, () => refresh())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, [user]);
 
   if (loading || !user) {
@@ -52,10 +72,22 @@ function Home() {
             <h1 className="text-3xl font-bold">{mode === "chat" ? "Chats" : "Wallet"}</h1>
             <Link
               to="/find"
-              className="ml-auto glass flex h-9 w-9 items-center justify-center rounded-full"
+              className="ml-auto relative glass flex h-9 w-9 items-center justify-center rounded-full"
               aria-label="Find people"
             >
               <UserPlus className="h-4 w-4" />
+              {mode === "chat" && pendingCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-background">
+                  {pendingCount > 9 ? "9+" : pendingCount}
+                </span>
+              )}
+            </Link>
+            <Link
+              to="/keys"
+              className="glass flex h-9 w-9 items-center justify-center rounded-full"
+              aria-label="Backup encryption keys"
+            >
+              <KeyRound className="h-3.5 w-3.5" />
             </Link>
             <button
               onClick={signOut}

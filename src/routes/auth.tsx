@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import logo from "@/assets/lumens-logo.png";
-import { Mail, Lock, User as UserIcon, Loader2, KeyRound } from "lucide-react";
+import { Mail, Lock, User as UserIcon, Loader2, KeyRound, Phone, AtSign } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
@@ -20,6 +20,8 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [username, setUsername] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -33,15 +35,28 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data: signed, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { display_name: name || email.split("@")[0] },
+            data: {
+              display_name: name || email.split("@")[0],
+              phone: phone || null,
+              username: username || null,
+            },
           },
         });
         if (error) throw error;
+        // Save phone + username to profile so other people can find this user
+        const uid = signed.user?.id;
+        if (uid) {
+          await supabase.from("profiles").update({
+            phone: phone || null,
+            username: username ? username.trim().toLowerCase() : null,
+            display_name: name || email.split("@")[0],
+          }).eq("id", uid);
+        }
         toast.success("Check your email to confirm your account.");
       } else if (mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -108,15 +123,35 @@ function AuthPage() {
 
           <form onSubmit={handleSubmit} className="space-y-3">
             {mode === "signup" && (
-              <Field icon={UserIcon}>
-                <input
-                  required
-                  placeholder="Display name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="flex-1 bg-transparent text-sm outline-none"
-                />
-              </Field>
+              <>
+                <Field icon={UserIcon}>
+                  <input
+                    required
+                    placeholder="Display name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="flex-1 bg-transparent text-sm outline-none"
+                  />
+                </Field>
+                <Field icon={AtSign}>
+                  <input
+                    placeholder="Username (optional, for search)"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.replace(/\s+/g, "").toLowerCase())}
+                    maxLength={30}
+                    className="flex-1 bg-transparent text-sm outline-none"
+                  />
+                </Field>
+                <Field icon={Phone}>
+                  <input
+                    type="tel"
+                    placeholder="+1 555 123 4567 (optional, for contact discovery)"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="flex-1 bg-transparent text-sm outline-none"
+                  />
+                </Field>
+              </>
             )}
 
             {mode !== "otp" || !otpSent ? (
