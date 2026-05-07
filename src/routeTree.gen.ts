@@ -9,27 +9,52 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TrustlinesRouteImport } from './routes/trustlines'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SendRouteImport } from './routes/send'
+import { Route as ScanRouteImport } from './routes/scan'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ReceiveRouteImport } from './routes/receive'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as NewChatRouteImport } from './routes/new-chat'
 import { Route as KeysRouteImport } from './routes/keys'
 import { Route as FindRouteImport } from './routes/find'
 import { Route as ContactsRouteImport } from './routes/contacts'
+import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WalletWithdrawRouteImport } from './routes/wallet.withdraw'
+import { Route as WalletTransferRouteImport } from './routes/wallet.transfer'
+import { Route as WalletSwapRouteImport } from './routes/wallet.swap'
+import { Route as WalletDepositRouteImport } from './routes/wallet.deposit'
 import { Route as TxHashRouteImport } from './routes/tx.$hash'
 import { Route as ChatIdRouteImport } from './routes/chat.$id'
 
+const WalletRoute = WalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrustlinesRoute = TrustlinesRouteImport.update({
   id: '/trustlines',
   path: '/trustlines',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SendRoute = SendRouteImport.update({
   id: '/send',
   path: '/send',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScanRoute = ScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -40,6 +65,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const ReceiveRoute = ReceiveRouteImport.update({
   id: '/receive',
   path: '/receive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewChatRoute = NewChatRouteImport.update({
@@ -62,9 +92,19 @@ const ContactsRoute = ContactsRouteImport.update({
   path: '/contacts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -72,122 +112,214 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WalletWithdrawRoute = WalletWithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
+  getParentRoute: () => WalletRoute,
+} as any)
+const WalletTransferRoute = WalletTransferRouteImport.update({
+  id: '/transfer',
+  path: '/transfer',
+  getParentRoute: () => WalletRoute,
+} as any)
+const WalletSwapRoute = WalletSwapRouteImport.update({
+  id: '/swap',
+  path: '/swap',
+  getParentRoute: () => WalletRoute,
+} as any)
+const WalletDepositRoute = WalletDepositRouteImport.update({
+  id: '/deposit',
+  path: '/deposit',
+  getParentRoute: () => WalletRoute,
+} as any)
 const TxHashRoute = TxHashRouteImport.update({
   id: '/tx/$hash',
   path: '/tx/$hash',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChatIdRoute = ChatIdRouteImport.update({
-  id: '/chat/$id',
-  path: '/chat/$id',
-  getParentRoute: () => rootRouteImport,
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ChatRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof ChatRouteWithChildren
   '/contacts': typeof ContactsRoute
   '/find': typeof FindRoute
   '/keys': typeof KeysRoute
   '/new-chat': typeof NewChatRoute
+  '/profile': typeof ProfileRoute
   '/receive': typeof ReceiveRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/scan': typeof ScanRoute
   '/send': typeof SendRoute
+  '/settings': typeof SettingsRoute
   '/trustlines': typeof TrustlinesRoute
+  '/wallet': typeof WalletRouteWithChildren
   '/chat/$id': typeof ChatIdRoute
   '/tx/$hash': typeof TxHashRoute
+  '/wallet/deposit': typeof WalletDepositRoute
+  '/wallet/swap': typeof WalletSwapRoute
+  '/wallet/transfer': typeof WalletTransferRoute
+  '/wallet/withdraw': typeof WalletWithdrawRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof ChatRouteWithChildren
   '/contacts': typeof ContactsRoute
   '/find': typeof FindRoute
   '/keys': typeof KeysRoute
   '/new-chat': typeof NewChatRoute
+  '/profile': typeof ProfileRoute
   '/receive': typeof ReceiveRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/scan': typeof ScanRoute
   '/send': typeof SendRoute
+  '/settings': typeof SettingsRoute
   '/trustlines': typeof TrustlinesRoute
+  '/wallet': typeof WalletRouteWithChildren
   '/chat/$id': typeof ChatIdRoute
   '/tx/$hash': typeof TxHashRoute
+  '/wallet/deposit': typeof WalletDepositRoute
+  '/wallet/swap': typeof WalletSwapRoute
+  '/wallet/transfer': typeof WalletTransferRoute
+  '/wallet/withdraw': typeof WalletWithdrawRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof ChatRouteWithChildren
   '/contacts': typeof ContactsRoute
   '/find': typeof FindRoute
   '/keys': typeof KeysRoute
   '/new-chat': typeof NewChatRoute
+  '/profile': typeof ProfileRoute
   '/receive': typeof ReceiveRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/scan': typeof ScanRoute
   '/send': typeof SendRoute
+  '/settings': typeof SettingsRoute
   '/trustlines': typeof TrustlinesRoute
+  '/wallet': typeof WalletRouteWithChildren
   '/chat/$id': typeof ChatIdRoute
   '/tx/$hash': typeof TxHashRoute
+  '/wallet/deposit': typeof WalletDepositRoute
+  '/wallet/swap': typeof WalletSwapRoute
+  '/wallet/transfer': typeof WalletTransferRoute
+  '/wallet/withdraw': typeof WalletWithdrawRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/analytics'
     | '/auth'
+    | '/chat'
     | '/contacts'
     | '/find'
     | '/keys'
     | '/new-chat'
+    | '/profile'
     | '/receive'
     | '/reset-password'
+    | '/scan'
     | '/send'
+    | '/settings'
     | '/trustlines'
+    | '/wallet'
     | '/chat/$id'
     | '/tx/$hash'
+    | '/wallet/deposit'
+    | '/wallet/swap'
+    | '/wallet/transfer'
+    | '/wallet/withdraw'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/analytics'
     | '/auth'
+    | '/chat'
     | '/contacts'
     | '/find'
     | '/keys'
     | '/new-chat'
+    | '/profile'
     | '/receive'
     | '/reset-password'
+    | '/scan'
     | '/send'
+    | '/settings'
     | '/trustlines'
+    | '/wallet'
     | '/chat/$id'
     | '/tx/$hash'
+    | '/wallet/deposit'
+    | '/wallet/swap'
+    | '/wallet/transfer'
+    | '/wallet/withdraw'
   id:
     | '__root__'
     | '/'
+    | '/analytics'
     | '/auth'
+    | '/chat'
     | '/contacts'
     | '/find'
     | '/keys'
     | '/new-chat'
+    | '/profile'
     | '/receive'
     | '/reset-password'
+    | '/scan'
     | '/send'
+    | '/settings'
     | '/trustlines'
+    | '/wallet'
     | '/chat/$id'
     | '/tx/$hash'
+    | '/wallet/deposit'
+    | '/wallet/swap'
+    | '/wallet/transfer'
+    | '/wallet/withdraw'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalyticsRoute: typeof AnalyticsRoute
   AuthRoute: typeof AuthRoute
+  ChatRoute: typeof ChatRouteWithChildren
   ContactsRoute: typeof ContactsRoute
   FindRoute: typeof FindRoute
   KeysRoute: typeof KeysRoute
   NewChatRoute: typeof NewChatRoute
+  ProfileRoute: typeof ProfileRoute
   ReceiveRoute: typeof ReceiveRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ScanRoute: typeof ScanRoute
   SendRoute: typeof SendRoute
+  SettingsRoute: typeof SettingsRoute
   TrustlinesRoute: typeof TrustlinesRoute
-  ChatIdRoute: typeof ChatIdRoute
+  WalletRoute: typeof WalletRouteWithChildren
   TxHashRoute: typeof TxHashRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wallet': {
+      id: '/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof WalletRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trustlines': {
       id: '/trustlines'
       path: '/trustlines'
@@ -195,11 +327,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrustlinesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/send': {
       id: '/send'
       path: '/send'
       fullPath: '/send'
       preLoaderRoute: typeof SendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scan': {
+      id: '/scan'
+      path: '/scan'
+      fullPath: '/scan'
+      preLoaderRoute: typeof ScanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -214,6 +360,13 @@ declare module '@tanstack/react-router' {
       path: '/receive'
       fullPath: '/receive'
       preLoaderRoute: typeof ReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/new-chat': {
@@ -244,11 +397,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -257,6 +424,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/wallet/withdraw': {
+      id: '/wallet/withdraw'
+      path: '/withdraw'
+      fullPath: '/wallet/withdraw'
+      preLoaderRoute: typeof WalletWithdrawRouteImport
+      parentRoute: typeof WalletRoute
+    }
+    '/wallet/transfer': {
+      id: '/wallet/transfer'
+      path: '/transfer'
+      fullPath: '/wallet/transfer'
+      preLoaderRoute: typeof WalletTransferRouteImport
+      parentRoute: typeof WalletRoute
+    }
+    '/wallet/swap': {
+      id: '/wallet/swap'
+      path: '/swap'
+      fullPath: '/wallet/swap'
+      preLoaderRoute: typeof WalletSwapRouteImport
+      parentRoute: typeof WalletRoute
+    }
+    '/wallet/deposit': {
+      id: '/wallet/deposit'
+      path: '/deposit'
+      fullPath: '/wallet/deposit'
+      preLoaderRoute: typeof WalletDepositRouteImport
+      parentRoute: typeof WalletRoute
     }
     '/tx/$hash': {
       id: '/tx/$hash'
@@ -267,26 +462,58 @@ declare module '@tanstack/react-router' {
     }
     '/chat/$id': {
       id: '/chat/$id'
-      path: '/chat/$id'
+      path: '/$id'
       fullPath: '/chat/$id'
       preLoaderRoute: typeof ChatIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ChatRoute
     }
   }
 }
 
+interface ChatRouteChildren {
+  ChatIdRoute: typeof ChatIdRoute
+}
+
+const ChatRouteChildren: ChatRouteChildren = {
+  ChatIdRoute: ChatIdRoute,
+}
+
+const ChatRouteWithChildren = ChatRoute._addFileChildren(ChatRouteChildren)
+
+interface WalletRouteChildren {
+  WalletDepositRoute: typeof WalletDepositRoute
+  WalletSwapRoute: typeof WalletSwapRoute
+  WalletTransferRoute: typeof WalletTransferRoute
+  WalletWithdrawRoute: typeof WalletWithdrawRoute
+}
+
+const WalletRouteChildren: WalletRouteChildren = {
+  WalletDepositRoute: WalletDepositRoute,
+  WalletSwapRoute: WalletSwapRoute,
+  WalletTransferRoute: WalletTransferRoute,
+  WalletWithdrawRoute: WalletWithdrawRoute,
+}
+
+const WalletRouteWithChildren =
+  WalletRoute._addFileChildren(WalletRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalyticsRoute: AnalyticsRoute,
   AuthRoute: AuthRoute,
+  ChatRoute: ChatRouteWithChildren,
   ContactsRoute: ContactsRoute,
   FindRoute: FindRoute,
   KeysRoute: KeysRoute,
   NewChatRoute: NewChatRoute,
+  ProfileRoute: ProfileRoute,
   ReceiveRoute: ReceiveRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ScanRoute: ScanRoute,
   SendRoute: SendRoute,
+  SettingsRoute: SettingsRoute,
   TrustlinesRoute: TrustlinesRoute,
-  ChatIdRoute: ChatIdRoute,
+  WalletRoute: WalletRouteWithChildren,
   TxHashRoute: TxHashRoute,
 }
 export const routeTree = rootRouteImport

@@ -4,14 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import logo from "@/assets/lumens-logo.png";
-import { Mail, Lock, User as UserIcon, Loader2, KeyRound, Phone, AtSign } from "lucide-react";
+import { Mail, Lock, User as UserIcon, Loader2, Phone, AtSign } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
   head: () => ({ meta: [{ title: "Sign in — Lumens" }] }),
 });
 
-type Mode = "signin" | "signup" | "otp" | "forgot";
+type Mode = "signin" | "signup" | "forgot";
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -22,8 +22,6 @@ function AuthPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
