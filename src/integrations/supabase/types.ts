@@ -145,7 +145,9 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          date_of_birth: string | null
           display_name: string | null
+          email: string | null
           id: string
           phone: string | null
           public_key: string | null
@@ -156,7 +158,9 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          date_of_birth?: string | null
           display_name?: string | null
+          email?: string | null
           id: string
           phone?: string | null
           public_key?: string | null
@@ -167,7 +171,9 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          date_of_birth?: string | null
           display_name?: string | null
+          email?: string | null
           id?: string
           phone?: string | null
           public_key?: string | null
@@ -203,6 +209,27 @@ export type Database = {
           is_favorite?: boolean
           label?: string
           memo?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_pins: {
+        Row: {
+          created_at: string
+          pin_hash: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          pin_hash: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          pin_hash?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
