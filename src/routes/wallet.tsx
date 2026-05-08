@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { getOrCreateWallet, getXlmBalance, shortAddress, streamPayments } from "@/lib/wallet";
-import { ArrowUpRight, ArrowDownLeft, ArrowLeftRight, Banknote, Bell, Plus, Repeat } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, ArrowLeftRight, Banknote, Bell, Plus, Repeat, Settings } from "lucide-react";
 import logo from "@/assets/lumens-logo.png";
 import { CryptoIcon, cryptoMeta } from "@/components/CryptoIcon";
+import { PinGate } from "@/components/PinGate";
 
 export const Route = createFileRoute("/wallet")({
-  component: WalletHub,
+  component: () => <PinGate><WalletHub /></PinGate>,
   head: () => ({ meta: [{ title: "Wallet — Lumens" }] }),
 });
 
@@ -69,6 +70,9 @@ function WalletHub() {
           <Bell className="h-4 w-4" />
           <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-rose-500" />
         </button>
+        <Link to="/settings" className="glass h-10 w-10 rounded-full flex items-center justify-center" aria-label="Settings">
+          <Settings className="h-4 w-4" />
+        </Link>
       </header>
 
       <section className="text-center py-4">

@@ -6,7 +6,7 @@ import { ensureKeypair } from "@/lib/crypto";
 import { supabase } from "@/integrations/supabase/client";
 import { getOrCreateWallet, getXlmBalance } from "@/lib/wallet";
 import logo from "@/assets/lumens-logo.png";
-import { Bell, ArrowUpRight, ArrowDownLeft, ArrowLeftRight, Banknote, MessageCircle, Wallet, ScanLine } from "lucide-react";
+import { Bell, Settings, ArrowUpRight, ArrowDownLeft, ArrowLeftRight, Banknote, MessageCircle, Wallet, ScanLine } from "lucide-react";
 import { cryptoMeta } from "@/components/CryptoIcon";
 
 export const Route = createFileRoute("/")({
@@ -23,7 +23,9 @@ function Home() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
+  const [avatar, setAvatar] = useState<string | null>(null);
   const [xlm, setXlm] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -35,11 +37,17 @@ function Home() {
       const { publicKey } = await ensureKeypair();
       await supabase.from("profiles").update({ public_key: publicKey }).eq("id", user.id);
     })();
-    supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle()
-      .then(({ data }) => setName(data?.display_name ?? ""));
+    supabase.from("profiles").select("display_name, avatar_url").eq("id", user.id).maybeSingle()
+      .then(({ data }) => { setName(data?.display_name ?? ""); setAvatar(data?.avatar_url ?? null); });
     const w = getOrCreateWallet();
     getXlmBalance(w.publicKey).then(setXlm);
   }, [user]);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   if (loading || !user) return <WelcomeSplash />;
 
@@ -55,20 +63,39 @@ function Home() {
   return (
     <>
       <WelcomeSplash />
-      <div className="min-h-screen mx-auto max-w-md px-5 pt-5 pb-32">
-        <header className="flex items-center gap-3 mb-5">
-          <img src={logo} alt="Lumens" className="h-10 w-auto" />
-          <div className="flex-1">
-            <p className="text-xs text-muted-foreground">Welcome Back</p>
-            <h1 className="text-xl font-bold leading-tight">Hello {name || "friend"}</h1>
-          </div>
-          <button className="glass h-10 w-10 rounded-full flex items-center justify-center relative">
-            <Bell className="h-4 w-4" />
-            <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-rose-500" />
-          </button>
-        </header>
 
-        <section className="text-center py-6">
+      {/* Sticky header with center logo that shrinks on scroll */}
+      <div className="sticky top-0 z-30 backdrop-blur-xl bg-background/60">
+        <div className="mx-auto max-w-md px-5 pt-4 pb-3 flex items-center justify-between">
+          <Link to="/profile" aria-label="Profile" className="h-11 w-11 rounded-full glass-strong overflow-hidden flex items-center justify-center ring-2 ring-white/40">
+            {avatar
+              ? <img src={avatar} alt="me" className="h-full w-full object-cover" />
+              : <span className="font-bold">{(name || "?").charAt(0).toUpperCase()}</span>}
+          </Link>
+          <img
+            src={logo}
+            alt="Lumens"
+            className={`transition-all duration-300 ease-out w-auto ${scrolled ? "h-9" : "h-16"}`}
+          />
+          <div className="flex items-center gap-2">
+            <button className="glass h-10 w-10 rounded-full flex items-center justify-center relative" aria-label="Notifications">
+              <Bell className="h-4 w-4" />
+              <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-rose-500" />
+            </button>
+            <Link to="/settings" className="glass h-10 w-10 rounded-full flex items-center justify-center" aria-label="Settings">
+              <Settings className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="min-h-screen mx-auto max-w-md px-5 pt-2 pb-32">
+        <div className="mb-4">
+          <p className="text-xs text-muted-foreground">Welcome back</p>
+          <h1 className="text-2xl font-bold leading-tight">Hello {name || "friend"} 👋</h1>
+        </div>
+
+        <section className="glass-strong rounded-3xl text-center py-7 shadow-soft mb-6">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">Total Balance</p>
           <h2 className="mt-1 text-5xl font-bold tracking-tight">
             ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -99,7 +126,7 @@ function Home() {
           ))}
         </div>
 
-        <div className="glass rounded-2xl p-5 text-sm text-muted-foreground text-center">
+        <div className="glass-strong rounded-2xl p-5 text-sm text-muted-foreground text-center shadow-soft">
           🔒 End-to-end encrypted messaging · Non-custodial Stellar wallet
         </div>
       </div>
