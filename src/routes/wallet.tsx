@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { getOrCreateWallet, getXlmBalance, shortAddress, streamPayments } from "@/lib/wallet";
-import { ArrowUpRight, ArrowDownLeft, ArrowLeftRight, Banknote, Bell, Plus, Repeat } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, ArrowLeftRight, Banknote, Bell, Plus, Repeat, Settings } from "lucide-react";
 import logo from "@/assets/lumens-logo.png";
 import { CryptoIcon, cryptoMeta } from "@/components/CryptoIcon";
+import { PinGate } from "@/components/PinGate";
 
 export const Route = createFileRoute("/wallet")({
-  component: WalletHub,
+  component: () => <PinGate><WalletHub /></PinGate>,
   head: () => ({ meta: [{ title: "Wallet — Lumens" }] }),
 });
 
