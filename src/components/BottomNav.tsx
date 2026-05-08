@@ -44,7 +44,7 @@ export function BottomNav() {
             <DrawerBtn onClick={() => { setOpen(false); navigate({ to: "/profile" }); }} Icon={User} label="Profile" />
             <DrawerBtn onClick={() => { setOpen(false); navigate({ to: "/keys" }); }} Icon={KeyRound} label="Keys" />
             <DrawerBtn onClick={() => { setOpen(false); navigate({ to: "/settings" }); }} Icon={SettingsIcon} label="Settings" />
-            <DrawerBtn onClick={async () => { setOpen(false); await signOut(); navigate({ to: "/auth" }); }} Icon={LogOut} label="Sign out" />
+            <DrawerBtn onClick={async () => { setOpen(false); lockPin(); await signOut(); navigate({ to: "/auth" }); }} Icon={LogOut} label="Sign out" />
           </div>
 
           <nav className="glass-strong rounded-full shadow-glass flex items-center justify-around px-3 py-2.5 backdrop-blur-2xl">
