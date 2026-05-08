@@ -13,6 +13,7 @@ export const Route = createFileRoute("/auth")({
 
 type Mode = "signin" | "signup" | "forgot";
 
+
 function AuthPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
