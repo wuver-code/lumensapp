@@ -120,13 +120,17 @@ function Find() {
     const note = requestNote.trim().slice(0, 280) || null;
     const { error } = await supabase
       .from("contact_requests")
-      .insert({ from_user: user.id, to_user: requestTarget.id, status: "pending", message: note });
+      .upsert(
+        { from_user: user.id, to_user: requestTarget.id, status: "pending", message: note, updated_at: new Date().toISOString() },
+        { onConflict: "from_user,to_user" },
+      );
     if (error) return toast.error(error.message);
     toast.success("Request sent");
     setRequestTarget(null);
     setRequestNote("");
     load();
   };
+
 
   const respond = async (req: Req, status: "accepted" | "declined") => {
     const { error } = await supabase

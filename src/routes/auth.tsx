@@ -46,13 +46,13 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        // Save phone + username to profile so other people can find this user
         const uid = signed.user?.id;
         if (uid) {
           await supabase.from("profiles").update({
             phone: phone || null,
             username: username ? username.trim().toLowerCase() : null,
             display_name: name || email.split("@")[0],
+            email,
           }).eq("id", uid);
         }
         toast.success("Check your email to confirm your account.");
@@ -61,21 +61,6 @@ function AuthPage() {
         if (error) throw error;
         toast.success("Welcome back ✨");
         navigate({ to: "/" });
-      } else if (mode === "otp") {
-        if (!otpSent) {
-          const { error } = await supabase.auth.signInWithOtp({
-            email,
-            options: { shouldCreateUser: true, emailRedirectTo: window.location.origin },
-          });
-          if (error) throw error;
-          setOtpSent(true);
-          toast.success("Code sent — check your email.");
-        } else {
-          const { error } = await supabase.auth.verifyOtp({ email, token: otp, type: "email" });
-          if (error) throw error;
-          toast.success("Signed in ✨");
-          navigate({ to: "/" });
-        }
       } else if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
@@ -100,16 +85,15 @@ function AuthPage() {
         </div>
 
         <div className="glass-strong rounded-3xl p-6 shadow-soft">
-          <div className="grid grid-cols-3 gap-1 p-1 rounded-full bg-foreground/5 mb-6">
+          <div className="grid grid-cols-2 gap-1 p-1 rounded-full bg-foreground/5 mb-6">
             {([
               { id: "signin", label: "Sign in" },
               { id: "signup", label: "Sign up" },
-              { id: "otp", label: "Email code" },
             ] as { id: Mode; label: string }[]).map((m) => (
               <button
                 key={m.id}
                 type="button"
-                onClick={() => { setMode(m.id); setOtpSent(false); }}
+                onClick={() => setMode(m.id)}
                 className={`py-2 text-xs font-semibold rounded-full transition ${
                   mode === m.id ? "bg-foreground text-background" : "text-muted-foreground"
                 }`}
@@ -152,18 +136,16 @@ function AuthPage() {
               </>
             )}
 
-            {mode !== "otp" || !otpSent ? (
-              <Field icon={Mail}>
-                <input
-                  required
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 bg-transparent text-sm outline-none"
-                />
-              </Field>
-            ) : null}
+            <Field icon={Mail}>
+              <input
+                required
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 bg-transparent text-sm outline-none"
+              />
+            </Field>
 
             {(mode === "signin" || mode === "signup") && (
               <Field icon={Lock}>
@@ -179,19 +161,6 @@ function AuthPage() {
               </Field>
             )}
 
-            {mode === "otp" && otpSent && (
-              <Field icon={KeyRound}>
-                <input
-                  required
-                  inputMode="numeric"
-                  placeholder="6-digit code"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="flex-1 bg-transparent text-sm outline-none tracking-widest"
-                />
-              </Field>
-            )}
-
             <button
               type="submit"
               disabled={loading}
@@ -200,7 +169,6 @@ function AuthPage() {
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               {mode === "signin" && "Sign in"}
               {mode === "signup" && "Create account"}
-              {mode === "otp" && (otpSent ? "Verify code" : "Send email code")}
               {mode === "forgot" && "Send reset link"}
             </button>
           </form>
