@@ -74,7 +74,9 @@ function RootComponent() {
   return (
     <AuthProvider>
       <Outlet />
+      <BottomNav />
       <Toaster position="top-center" />
     </AuthProvider>
   );
 }
+
