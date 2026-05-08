@@ -2,6 +2,7 @@ import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { Home, MessageCircle, ScanLine, Wallet, User, BarChart3, Settings as SettingsIcon, LogOut, KeyRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { lockPin } from "@/components/PinGate";
 
 export function BottomNav() {
   const { user, signOut } = useAuth();
