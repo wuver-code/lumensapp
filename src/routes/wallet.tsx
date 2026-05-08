@@ -70,6 +70,9 @@ function WalletHub() {
           <Bell className="h-4 w-4" />
           <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-rose-500" />
         </button>
+        <Link to="/settings" className="glass h-10 w-10 rounded-full flex items-center justify-center" aria-label="Settings">
+          <Settings className="h-4 w-4" />
+        </Link>
       </header>
 
       <section className="text-center py-4">
