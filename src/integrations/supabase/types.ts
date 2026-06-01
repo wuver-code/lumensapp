@@ -276,6 +276,16 @@ export type Database = {
     }
     Functions: {
       are_contacts: { Args: { _a: string; _b: string }; Returns: boolean }
+      find_by_phone_hashes: {
+        Args: { _hashes: string[] }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          id: string
+          phone: string
+          username: string
+        }[]
+      }
       find_by_phones: {
         Args: { _phones: string[] }
         Returns: {

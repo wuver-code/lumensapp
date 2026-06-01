@@ -104,7 +104,16 @@ function Find() {
       .map((p) => p.trim())
       .filter(Boolean);
     if (!phones.length) return;
-    const { data, error } = await supabase.rpc("find_by_phones", { _phones: phones });
+    // Hash normalized digits on-device so raw numbers never reach the server
+    const enc = new TextEncoder();
+    const hashes = await Promise.all(
+      phones.map(async (raw) => {
+        const digits = raw.replace(/\D/g, "");
+        const buf = await crypto.subtle.digest("SHA-256", enc.encode(digits));
+        return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+      }),
+    );
+    const { data, error } = await supabase.rpc("find_by_phone_hashes", { _hashes: hashes });
     if (error) return toast.error(error.message);
     setResults((data ?? []) as Profile[]);
     if (!data?.length) toast("No matches on Lumens yet.");
@@ -144,16 +153,32 @@ function Find() {
 
   const startChat = async (otherId: string) => {
     if (!user) return;
+    // Reuse an existing 1:1 conversation if one already exists
+    const { data: myConvs } = await supabase
+      .from("conversation_members").select("conversation_id").eq("user_id", user.id);
+    const myIds = (myConvs ?? []).map((m) => m.conversation_id);
+    if (myIds.length) {
+      const { data: shared } = await supabase
+        .from("conversation_members").select("conversation_id")
+        .eq("user_id", otherId).in("conversation_id", myIds);
+      const existing = shared?.[0]?.conversation_id;
+      if (existing) return navigate({ to: "/chat/$id", params: { id: existing } });
+    }
+
     const { data: conv, error } = await supabase
       .from("conversations")
       .insert({ created_by: user.id, is_group: false })
-      .select()
-      .single();
-    if (error || !conv) return toast.error(error?.message ?? "Failed");
-    await supabase.from("conversation_members").insert([
-      { conversation_id: conv.id, user_id: user.id },
-      { conversation_id: conv.id, user_id: otherId },
-    ]);
+      .select().single();
+    if (error || !conv) return toast.error(error?.message ?? "Failed to create chat");
+    // Insert self first so is_conversation_member() passes when adding the peer
+    const { error: e1 } = await supabase
+      .from("conversation_members")
+      .insert({ conversation_id: conv.id, user_id: user.id });
+    if (e1) return toast.error(e1.message);
+    const { error: e2 } = await supabase
+      .from("conversation_members")
+      .insert({ conversation_id: conv.id, user_id: otherId });
+    if (e2) return toast.error(e2.message);
     navigate({ to: "/chat/$id", params: { id: conv.id } });
   };
 

@@ -21,6 +21,9 @@ export type LocalMessage = {
   senderId: string;
   text: string;
   createdAt: number;
+  kind?: "text" | "image" | "audio";
+  // Data URL for image/audio attachments. Stored only on this device.
+  media?: string;
 };
 
 export async function saveMessage(msg: LocalMessage) {
