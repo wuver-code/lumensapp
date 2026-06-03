@@ -30,6 +30,7 @@ import { Route as WalletTransferRouteImport } from './routes/wallet.transfer'
 import { Route as WalletSwapRouteImport } from './routes/wallet.swap'
 import { Route as WalletDepositRouteImport } from './routes/wallet.deposit'
 import { Route as TxHashRouteImport } from './routes/tx.$hash'
+import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
 import { Route as ChatIdRouteImport } from './routes/chat.$id'
 
 const WalletRoute = WalletRouteImport.update({
@@ -137,6 +138,11 @@ const TxHashRoute = TxHashRouteImport.update({
   path: '/tx/$hash',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileUserIdRoute = ProfileUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => ProfileRoute,
+} as any)
 const ChatIdRoute = ChatIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -152,7 +158,7 @@ export interface FileRoutesByFullPath {
   '/find': typeof FindRoute
   '/keys': typeof KeysRoute
   '/new-chat': typeof NewChatRoute
-  '/profile': typeof ProfileRoute
+  '/profile': typeof ProfileRouteWithChildren
   '/receive': typeof ReceiveRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scan': typeof ScanRoute
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/trustlines': typeof TrustlinesRoute
   '/wallet': typeof WalletRouteWithChildren
   '/chat/$id': typeof ChatIdRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
   '/tx/$hash': typeof TxHashRoute
   '/wallet/deposit': typeof WalletDepositRoute
   '/wallet/swap': typeof WalletSwapRoute
@@ -176,7 +183,7 @@ export interface FileRoutesByTo {
   '/find': typeof FindRoute
   '/keys': typeof KeysRoute
   '/new-chat': typeof NewChatRoute
-  '/profile': typeof ProfileRoute
+  '/profile': typeof ProfileRouteWithChildren
   '/receive': typeof ReceiveRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scan': typeof ScanRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/trustlines': typeof TrustlinesRoute
   '/wallet': typeof WalletRouteWithChildren
   '/chat/$id': typeof ChatIdRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
   '/tx/$hash': typeof TxHashRoute
   '/wallet/deposit': typeof WalletDepositRoute
   '/wallet/swap': typeof WalletSwapRoute
@@ -201,7 +209,7 @@ export interface FileRoutesById {
   '/find': typeof FindRoute
   '/keys': typeof KeysRoute
   '/new-chat': typeof NewChatRoute
-  '/profile': typeof ProfileRoute
+  '/profile': typeof ProfileRouteWithChildren
   '/receive': typeof ReceiveRoute
   '/reset-password': typeof ResetPasswordRoute
   '/scan': typeof ScanRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/trustlines': typeof TrustlinesRoute
   '/wallet': typeof WalletRouteWithChildren
   '/chat/$id': typeof ChatIdRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
   '/tx/$hash': typeof TxHashRoute
   '/wallet/deposit': typeof WalletDepositRoute
   '/wallet/swap': typeof WalletSwapRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/trustlines'
     | '/wallet'
     | '/chat/$id'
+    | '/profile/$userId'
     | '/tx/$hash'
     | '/wallet/deposit'
     | '/wallet/swap'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/trustlines'
     | '/wallet'
     | '/chat/$id'
+    | '/profile/$userId'
     | '/tx/$hash'
     | '/wallet/deposit'
     | '/wallet/swap'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/trustlines'
     | '/wallet'
     | '/chat/$id'
+    | '/profile/$userId'
     | '/tx/$hash'
     | '/wallet/deposit'
     | '/wallet/swap'
@@ -300,7 +312,7 @@ export interface RootRouteChildren {
   FindRoute: typeof FindRoute
   KeysRoute: typeof KeysRoute
   NewChatRoute: typeof NewChatRoute
-  ProfileRoute: typeof ProfileRoute
+  ProfileRoute: typeof ProfileRouteWithChildren
   ReceiveRoute: typeof ReceiveRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ScanRoute: typeof ScanRoute
@@ -460,6 +472,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TxHashRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile/$userId': {
+      id: '/profile/$userId'
+      path: '/$userId'
+      fullPath: '/profile/$userId'
+      preLoaderRoute: typeof ProfileUserIdRouteImport
+      parentRoute: typeof ProfileRoute
+    }
     '/chat/$id': {
       id: '/chat/$id'
       path: '/$id'
@@ -479,6 +498,17 @@ const ChatRouteChildren: ChatRouteChildren = {
 }
 
 const ChatRouteWithChildren = ChatRoute._addFileChildren(ChatRouteChildren)
+
+interface ProfileRouteChildren {
+  ProfileUserIdRoute: typeof ProfileUserIdRoute
+}
+
+const ProfileRouteChildren: ProfileRouteChildren = {
+  ProfileUserIdRoute: ProfileUserIdRoute,
+}
+
+const ProfileRouteWithChildren =
+  ProfileRoute._addFileChildren(ProfileRouteChildren)
 
 interface WalletRouteChildren {
   WalletDepositRoute: typeof WalletDepositRoute
@@ -506,7 +536,7 @@ const rootRouteChildren: RootRouteChildren = {
   FindRoute: FindRoute,
   KeysRoute: KeysRoute,
   NewChatRoute: NewChatRoute,
-  ProfileRoute: ProfileRoute,
+  ProfileRoute: ProfileRouteWithChildren,
   ReceiveRoute: ReceiveRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ScanRoute: ScanRoute,

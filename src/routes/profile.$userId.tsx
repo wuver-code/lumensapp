@@ -31,12 +31,12 @@ function ContactProfile() {
       if (!ok) { setAllowed(false); setLoading(false); return; }
       setAllowed(true);
       // contact_profile_view omits date_of_birth / email by design
-      const { data } = await supabase
-        .from("contact_profile_view" as any)
+      const { data } = await (supabase as any)
+        .from("contact_profile_view")
         .select("id, display_name, username, phone, wallet_address, avatar_url")
         .eq("id", userId)
         .maybeSingle();
-      setP((data as ContactProfile) ?? null);
+      setP((data as ContactProfile | null) ?? null);
       setLoading(false);
     })();
   }, [user, userId]);
