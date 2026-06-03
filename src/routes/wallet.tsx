@@ -130,6 +130,7 @@ function WalletHub() {
           ))}
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }
