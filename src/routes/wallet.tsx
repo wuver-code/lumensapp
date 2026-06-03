@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { getOrCreateWallet, getXlmBalance, shortAddress, streamPayments } from "@/lib/wallet";
-import { ArrowUpRight, ArrowDownLeft, ArrowLeftRight, Banknote, Bell, Plus, Repeat, Settings } from "lucide-react";
-import logo from "@/assets/lumens-logo.png";
+import { ArrowUpRight, ArrowDownLeft, ArrowLeftRight, Banknote, Plus, Repeat } from "lucide-react";
 import { CryptoIcon, cryptoMeta } from "@/components/CryptoIcon";
 import { PinGate } from "@/components/PinGate";
+import { AppHeader } from "@/components/AppHeader";
 
 export const Route = createFileRoute("/wallet")({
   component: () => <PinGate><WalletHub /></PinGate>,
@@ -59,21 +59,9 @@ function WalletHub() {
   ];
 
   return (
-    <div className="min-h-screen mx-auto max-w-md px-5 pt-5 pb-32">
-      <header className="flex items-center gap-3 mb-5">
-        <img src={logo} alt="Lumens" className="h-10 w-auto" />
-        <div className="flex-1">
-          <p className="text-xs text-muted-foreground">Welcome back</p>
-          <h1 className="text-xl font-bold leading-tight">Hello {name || "friend"}</h1>
-        </div>
-        <button className="glass h-10 w-10 rounded-full flex items-center justify-center relative" aria-label="Notifications">
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-rose-500" />
-        </button>
-        <Link to="/settings" className="glass h-10 w-10 rounded-full flex items-center justify-center" aria-label="Settings">
-          <Settings className="h-4 w-4" />
-        </Link>
-      </header>
+    <>
+      <AppHeader title={`Hello ${name || "friend"}`} />
+      <div className="min-h-screen mx-auto max-w-md px-5 pt-5 pb-32">
 
       <section className="text-center py-4">
         <p className="text-xs uppercase tracking-widest text-muted-foreground">Total Balance</p>
