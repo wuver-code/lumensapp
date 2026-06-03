@@ -4,6 +4,8 @@ import { ArrowLeft, Search, UserPlus, Check, X, Phone, ContactRound } from "luci
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { Avatar } from "@/components/Avatar";
+import { AppHeader } from "@/components/AppHeader";
 
 export const Route = createFileRoute("/find")({ component: Find });
 
@@ -198,7 +200,7 @@ function Find() {
           <div className="glass-strong rounded-3xl p-2">
             {incoming.map((r) => (
               <div key={r.id} className="flex items-start gap-3 p-3">
-                <Avatar name={r.profile?.display_name ?? "?"} />
+                <Avatar name={r.profile?.display_name} url={r.profile?.avatar_url} />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold truncate">{r.profile?.display_name ?? "Someone"}</p>
                   <p className="text-xs text-muted-foreground truncate">@{r.profile?.username ?? r.profile?.phone ?? ""}</p>
@@ -252,7 +254,7 @@ function Find() {
           <div className="glass-strong rounded-3xl p-2">
             {results.map((p) => (
               <div key={p.id} className="flex items-center gap-3 p-3">
-                <Avatar name={p.display_name ?? p.username ?? "?"} />
+                <Avatar name={p.display_name ?? p.username} url={p.avatar_url} />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold truncate">{p.display_name ?? p.username}</p>
                   <p className="text-xs text-muted-foreground truncate">{p.phone ?? p.username ?? ""}</p>
@@ -280,7 +282,7 @@ function Find() {
           <div className="glass-strong rounded-3xl p-2">
             {contacts.map((p) => (
               <button key={p.id} onClick={() => startChat(p.id)} className="flex w-full items-center gap-3 rounded-2xl p-3 hover:bg-accent/40 text-left">
-                <Avatar name={p.display_name ?? "?"} />
+                <Avatar name={p.display_name} url={p.avatar_url} />
                 <span className="flex-1 font-medium truncate">{p.display_name ?? p.username}</span>
                 <span className="text-xs text-muted-foreground">Chat →</span>
               </button>
@@ -316,10 +318,3 @@ function Find() {
   );
 }
 
-function Avatar({ name }: { name: string }) {
-  return (
-    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-300 to-orange-400 ring-2 ring-white/60 flex items-center justify-center text-white font-bold">
-      {name.charAt(0).toUpperCase()}
-    </div>
-  );
-}

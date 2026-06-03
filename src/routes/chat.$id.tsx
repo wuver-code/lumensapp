@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { encryptFor, decryptFrom, ensureKeypair } from "@/lib/crypto";
 import { saveMessage, listMessages, type LocalMessage } from "@/lib/messageStore";
 import { compressImage, blobToDataUrl, startVoiceRecorder, type Recorder } from "@/lib/media";
+import { Avatar } from "@/components/Avatar";
 
 export const Route = createFileRoute("/chat/$id")({ component: ChatRoom });
 
@@ -20,6 +21,7 @@ function ChatRoom() {
   const [text, setText] = useState("");
   const [peerKey, setPeerKey] = useState<string | null>(null);
   const [peerName, setPeerName] = useState("Conversation");
+  const [peerAvatar, setPeerAvatar] = useState<string | null>(null);
   const [peerId, setPeerId] = useState<string | null>(null);
   const [isAcceptedContact, setIsAcceptedContact] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -49,11 +51,12 @@ function ChatRoom() {
       setPeerId(peerIdLocal);
       const { data: peer } = await supabase
         .from("profiles")
-        .select("display_name, public_key")
+        .select("display_name, public_key, avatar_url")
         .eq("id", peerIdLocal)
         .maybeSingle();
       if (cancelled) return;
       setPeerName(peer?.display_name ?? "Conversation");
+      setPeerAvatar(peer?.avatar_url ?? null);
       setPeerKey(peer?.public_key ?? null);
       const { data: accepted } = await supabase.rpc("are_contacts", { _a: user.id, _b: peerIdLocal });
       if (!cancelled) setIsAcceptedContact(Boolean(accepted));
@@ -175,16 +178,23 @@ function ChatRoom() {
 
   return (
     <div className="min-h-screen flex flex-col mx-auto max-w-md">
-      <header className="sticky top-0 z-10 glass-strong flex items-center gap-3 px-5 py-4">
-        <Link to="/" className="text-muted-foreground"><ArrowLeft className="h-5 w-5" /></Link>
+      <header className="sticky top-0 z-10 backdrop-blur-xl bg-background/60 border-b border-white/10 flex items-center gap-3 px-4 py-3">
+        <Link to="/chat" className="text-muted-foreground" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link>
+        {peerId ? (
+          <Link to="/profile/$userId" params={{ userId: peerId }} className="shrink-0">
+            <Avatar url={peerAvatar} name={peerName} size={36} />
+          </Link>
+        ) : (
+          <Avatar name={peerName} size={36} />
+        )}
         <div className="flex-1 min-w-0">
-          <h1 className="font-bold truncate">{peerName}</h1>
-          <p className="text-[11px] inline-flex items-center gap-1.5 mt-0.5">
+          <h1 className="font-bold truncate text-sm">{peerName}</h1>
+          <p className="text-[11px] inline-flex items-center gap-1.5">
             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 font-semibold">
-              <ShieldCheck className="h-3 w-3" /> Encrypted (device-only)
+              <ShieldCheck className="h-3 w-3" /> Encrypted
             </span>
             {!isAcceptedContact && peerId && (
-              <span className="text-amber-600 dark:text-amber-400">· not yet a contact</span>
+              <span className="text-amber-600 dark:text-amber-400">· not a contact</span>
             )}
           </p>
         </div>

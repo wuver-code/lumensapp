@@ -272,7 +272,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      contact_profile_view: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          display_name: string | null
+          id: string | null
+          phone: string | null
+          public_key: string | null
+          updated_at: string | null
+          username: string | null
+          wallet_address: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string | null
+          phone?: string | null
+          public_key?: string | null
+          updated_at?: string | null
+          username?: string | null
+          wallet_address?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string | null
+          phone?: string | null
+          public_key?: string | null
+          updated_at?: string | null
+          username?: string | null
+          wallet_address?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       are_contacts: { Args: { _a: string; _b: string }; Returns: boolean }
