@@ -1,12 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Camera, Loader2 } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Camera, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PinGate } from "@/components/PinGate";
+import { AppHeader } from "@/components/AppHeader";
+import { Avatar } from "@/components/Avatar";
+import { getOrCreateWallet } from "@/lib/wallet";
 
-export const Route = createFileRoute("/profile")({ component: () => <PinGate><ProfilePage /></PinGate> });
+export const Route = createFileRoute("/profile")({
+  component: () => <PinGate><ProfilePage /></PinGate>,
+});
 
 type P = {
   display_name: string | null;
@@ -15,30 +20,51 @@ type P = {
   phone: string | null;
   date_of_birth: string | null;
   avatar_url: string | null;
+  wallet_address: string | null;
 };
 
 function ProfilePage() {
   const { user } = useAuth();
-  const [p, setP] = useState<P>({ display_name: "", username: "", email: "", phone: "", date_of_birth: "", avatar_url: "" });
+  const [p, setP] = useState<P>({
+    display_name: "", username: "", email: "", phone: "",
+    date_of_birth: "", avatar_url: "", wallet_address: "",
+  });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("display_name, username, email, phone, date_of_birth, avatar_url")
-      .eq("id", user.id).maybeSingle()
-      .then(({ data }) => { if (data) setP(data as P); else if (user.email) setP((x) => ({ ...x, email: user.email ?? "" })); });
+    // Always ensure a wallet address is stored on the profile for the owner
+    const w = getOrCreateWallet();
+    supabase
+      .from("profiles")
+      .select("display_name, username, email, phone, date_of_birth, avatar_url, wallet_address")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(async ({ data }) => {
+        let next = (data as P) ?? null;
+        if (next && !next.wallet_address) {
+          await supabase.from("profiles").update({ wallet_address: w.publicKey }).eq("id", user.id);
+          next = { ...next, wallet_address: w.publicKey };
+        }
+        if (next) setP({ ...next, email: next.email ?? user.email ?? "" });
+        else setP((x) => ({ ...x, email: user.email ?? "", wallet_address: w.publicKey }));
+      });
   }, [user]);
 
   const save = async () => {
     if (!user) return;
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
-      display_name: p.display_name, username: p.username?.toLowerCase() ?? null,
-      email: p.email, phone: p.phone, date_of_birth: p.date_of_birth || null,
+      display_name: p.display_name,
+      username: p.username?.toLowerCase() ?? null,
+      email: p.email,
+      phone: p.phone,
+      date_of_birth: p.date_of_birth || null,
     }).eq("id", user.id);
     setSaving(false);
-    if (error) toast.error(error.message); else toast.success("Profile updated");
+    if (error) toast.error(error.message);
+    else toast.success("Profile updated");
   };
 
   const onAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,45 +83,57 @@ function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen mx-auto max-w-md px-5 pt-5 pb-32">
-      <header className="flex items-center gap-3 mb-5">
-        <Link to="/wallet" className="glass h-10 w-10 rounded-full flex items-center justify-center"><ArrowLeft className="h-4 w-4" /></Link>
-        <h1 className="text-xl font-bold">Profile</h1>
-      </header>
+    <>
+      <AppHeader title="Profile" />
+      <div className="min-h-screen mx-auto max-w-md px-5 pt-5 pb-32">
+        <div className="flex flex-col items-center mb-6">
+          <label className="relative cursor-pointer group">
+            <div className="h-24 w-24 rounded-full overflow-hidden">
+              <Avatar url={p.avatar_url} name={p.display_name} size={96} />
+            </div>
+            <span className="absolute bottom-1 right-1 glass-strong h-9 w-9 rounded-full flex items-center justify-center shadow-soft">
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+            </span>
+            <input type="file" accept="image/*" onChange={onAvatar} className="hidden" />
+          </label>
+          <p className="mt-3 text-sm text-muted-foreground">Tap photo to change</p>
+        </div>
 
-      <div className="flex flex-col items-center mb-6">
-        <label className="relative cursor-pointer group">
-          <div className="h-28 w-28 rounded-full bg-gradient-to-br from-amber-300 to-orange-400 flex items-center justify-center text-white text-3xl font-bold ring-4 ring-white/60 overflow-hidden">
-            {p.avatar_url ? <img src={p.avatar_url} alt="avatar" className="h-full w-full object-cover" /> : (p.display_name ?? "?").charAt(0).toUpperCase()}
+        <div className="glass-strong rounded-3xl p-5 space-y-3 shadow-soft">
+          {[
+            { k: "display_name", label: "Full Name", type: "text" },
+            { k: "date_of_birth", label: "Date of Birth", type: "date" },
+            { k: "phone", label: "Phone Number", type: "tel" },
+            { k: "email", label: "Email Address", type: "email" },
+            { k: "username", label: "Username", type: "text" },
+          ].map((f) => (
+            <div key={f.k}>
+              <label className="text-[11px] uppercase tracking-wider text-muted-foreground">{f.label}</label>
+              <input
+                type={f.type as any}
+                value={(p as any)[f.k] ?? ""}
+                onChange={(e) => setP({ ...p, [f.k]: e.target.value } as P)}
+                placeholder="Not set"
+                className="mt-1 w-full bg-foreground/5 rounded-xl px-4 py-3 text-sm outline-none"
+              />
+            </div>
+          ))}
+          <div>
+            <label className="text-[11px] uppercase tracking-wider text-muted-foreground">Stellar Wallet</label>
+            <p className="mt-1 w-full bg-foreground/5 rounded-xl px-4 py-3 text-xs font-mono break-all">
+              {p.wallet_address || <span className="text-muted-foreground">Not set</span>}
+            </p>
           </div>
-          <span className="absolute bottom-1 right-1 glass-strong h-9 w-9 rounded-full flex items-center justify-center shadow-soft">
-            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
-          </span>
-          <input type="file" accept="image/*" onChange={onAvatar} className="hidden" />
-        </label>
-        <p className="mt-3 text-sm text-muted-foreground">Tap photo to change</p>
-      </div>
+        </div>
 
-      <div className="glass-strong rounded-3xl p-5 space-y-3 shadow-soft">
-        {[
-          { k: "display_name", label: "Full Name", type: "text" },
-          { k: "date_of_birth", label: "Date of Birth", type: "date" },
-          { k: "phone", label: "Phone Number", type: "tel" },
-          { k: "email", label: "Email Address", type: "email" },
-          { k: "username", label: "Username", type: "text" },
-        ].map((f) => (
-          <div key={f.k}>
-            <label className="text-[11px] uppercase tracking-wider text-muted-foreground">{f.label}</label>
-            <input type={f.type as any} value={(p as any)[f.k] ?? ""} onChange={(e) => setP({ ...p, [f.k]: e.target.value } as P)}
-              className="mt-1 w-full bg-foreground/5 rounded-xl px-4 py-3 text-sm outline-none" />
-          </div>
-        ))}
+        <button
+          onClick={save}
+          disabled={saving}
+          className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-full bg-foreground text-background font-semibold py-3.5 disabled:opacity-50"
+        >
+          {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save changes
+        </button>
       </div>
-
-      <button onClick={save} disabled={saving}
-        className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-full bg-foreground text-background font-semibold py-3.5 disabled:opacity-50">
-        {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save changes
-      </button>
-    </div>
+    </>
   );
 }
