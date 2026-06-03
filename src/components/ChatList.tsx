@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Search, Plus, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { Avatar } from "@/components/Avatar";
 
 type ConvRow = {
   id: string;
@@ -116,6 +117,7 @@ export function ChatList() {
         <div className="glass-strong rounded-3xl p-2 shadow-soft">
           {filtered.map((c) => {
             const name = display(c);
+            const peer = c.members.find((m) => m.user_id !== user?.id);
             const preview = "🔒 End-to-end encrypted";
             return (
               <Link
@@ -124,9 +126,7 @@ export function ChatList() {
                 params={{ id: c.id }}
                 className="flex w-full items-center gap-3 rounded-2xl p-3 text-left hover:bg-accent/40 transition"
               >
-                <div className={`h-12 w-12 rounded-full bg-gradient-to-br ${pickColor(name)} ring-2 ring-white/60 flex items-center justify-center text-white font-bold`}>
-                  {name.charAt(0).toUpperCase()}
-                </div>
+                <Avatar url={peer?.profile?.avatar_url} name={name} size={44} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <p className="font-semibold truncate">{name}</p>

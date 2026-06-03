@@ -4,6 +4,8 @@ import { ArrowLeft, Search, UserPlus, Check, X, Phone, ContactRound } from "luci
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { Avatar } from "@/components/Avatar";
+import { AppHeader } from "@/components/AppHeader";
 
 export const Route = createFileRoute("/find")({ component: Find });
 
@@ -316,10 +318,3 @@ function Find() {
   );
 }
 
-function Avatar({ name }: { name: string }) {
-  return (
-    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-300 to-orange-400 ring-2 ring-white/60 flex items-center justify-center text-white font-bold">
-      {name.charAt(0).toUpperCase()}
-    </div>
-  );
-}
