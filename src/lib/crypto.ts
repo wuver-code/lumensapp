@@ -73,7 +73,7 @@ export function exportKeypairBackup(): string {
 export async function importKeypairBackup(json: string): Promise<{ publicKey: string }> {
   const parsed = JSON.parse(json);
   if (parsed?.kind !== "lumens-e2ee-backup" || !parsed.pub || !parsed.priv) {
-    throw new Error("This file is not a valid Lumens key backup.");
+    throw new Error("This file is not a valid seyo! key backup.");
   }
   // Validate by importing
   await importPriv(parsed.priv);

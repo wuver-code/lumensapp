@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import logo from "@/assets/lumens-logo.png";
+import logo from "@/assets/seyo-logo.png";
 
 const SHOWN_KEY = "lumens.splashShown";
 
@@ -35,7 +35,7 @@ export function WelcomeSplash() {
           className="absolute -inset-24 rounded-full animate-logo-glow"
           style={{ background: "radial-gradient(circle, oklch(0.85 0.13 35 / 0.5), transparent 70%)" }}
         />
-        <img src={logo} alt="Lumens" className="relative h-72 md:h-80 w-auto animate-logo-rise" />
+        <img src={logo} alt="seyo!" className="relative h-72 md:h-80 w-auto animate-logo-rise" />
         <p
           className="relative text-xs uppercase tracking-[0.4em] text-muted-foreground animate-logo-rise"
           style={{ animationDelay: "0.3s" }}

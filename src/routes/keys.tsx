@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { ArrowLeft, Download, Upload, ShieldCheck, AlertTriangle } from "lucide-react";
+import { Download, Upload, ShieldCheck, AlertTriangle } from "lucide-react";
+import { AppHeader } from "@/components/AppHeader";
 import { exportKeypairBackup, importKeypairBackup } from "@/lib/crypto";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -20,7 +21,7 @@ function KeysPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `lumens-keys-${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `seyo-keys-${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success("Backup downloaded — store it somewhere safe.");
@@ -47,16 +48,15 @@ function KeysPage() {
   };
 
   return (
-    <div className="min-h-screen mx-auto max-w-md px-5 pt-6 pb-24 space-y-5">
-      <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-        <ArrowLeft className="h-4 w-4" /> Back
-      </Link>
+    <>
+      <AppHeader title="Encryption keys" />
+      <div className="min-h-screen mx-auto max-w-md px-5 pt-5 pb-32 space-y-5">
       <div className="flex items-center gap-2">
         <ShieldCheck className="h-5 w-5 text-emerald-500" />
-        <h1 className="text-2xl font-bold">Encryption keys</h1>
+        <h1 className="text-2xl font-bold">Your keys</h1>
       </div>
       <p className="text-sm text-muted-foreground">
-        Lumens chats use end-to-end encryption. Your private key lives only on this device.
+        seyo! chats use end-to-end encryption. Your private key lives only on this device.
         Export it to move chats to another device — or restore a backup here.
       </p>
 
@@ -82,9 +82,10 @@ function KeysPage() {
       <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-700 dark:text-amber-300 flex gap-2">
         <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
         <p>
-          Importing a key replaces this device's keys. Lumens has no way to recover messages if you lose your backup.
+          Importing a key replaces this device's keys. seyo! has no way to recover messages if you lose your backup.
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

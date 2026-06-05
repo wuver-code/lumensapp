@@ -202,7 +202,7 @@ function ChatRoom() {
       <main className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
         {!peerKey && (
           <p className="text-center text-xs text-muted-foreground py-8">
-            Waiting for the other person to open Lumens to exchange keys…
+            Waiting for the other person to open seyo! to exchange keys…
           </p>
         )}
         {!isAcceptedContact && peerId && (

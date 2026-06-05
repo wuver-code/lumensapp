@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ScanLine, X } from "lucide-react";
+import { ScanLine, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { toast } from "sonner";
+import { AppHeader } from "@/components/AppHeader";
 
 export const Route = createFileRoute("/scan")({ component: ScanPage });
 
@@ -53,11 +54,9 @@ function ScanPage() {
   useEffect(() => () => { stop(); }, []);
 
   return (
-    <div className="min-h-screen mx-auto max-w-md px-5 pt-5 pb-32">
-      <header className="flex items-center gap-3 mb-5">
-        <Link to="/wallet" className="glass h-10 w-10 rounded-full flex items-center justify-center"><ArrowLeft className="h-4 w-4" /></Link>
-        <h1 className="text-xl font-bold">Scan to pay</h1>
-      </header>
+    <>
+      <AppHeader title="Scan to pay" />
+      <div className="min-h-screen mx-auto max-w-md px-5 pt-5 pb-32">
 
       <div className="glass-strong rounded-3xl p-4 shadow-soft">
         <div id="qr-region" ref={ref} className="rounded-2xl overflow-hidden bg-black aspect-square flex items-center justify-center">
@@ -77,6 +76,7 @@ function ScanPage() {
         </div>
         <p className="mt-3 text-[11px] text-muted-foreground text-center">Camera permission required. Stellar QR codes auto-fill the transfer screen.</p>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
