@@ -10,7 +10,7 @@ import { AppHeader } from "@/components/AppHeader";
 
 export const Route = createFileRoute("/wallet")({
   component: () => <PinGate><WalletHub /></PinGate>,
-  head: () => ({ meta: [{ title: "Wallet — Lumens" }] }),
+  head: () => ({ meta: [{ title: "Wallet — seyo!" }] }),
 });
 
 type Tx = {

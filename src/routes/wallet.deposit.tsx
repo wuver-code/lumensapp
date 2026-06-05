@@ -23,7 +23,7 @@ function DepositPage() {
       .then(({ data }) => setPhone(data?.phone ?? ""));
   }, [user]);
 
-  const addr = selected === "XLM" ? xlmAddr : `lumens-${selected.toLowerCase()}-${(user?.id ?? "").slice(0, 8)}`;
+  const addr = selected === "XLM" ? xlmAddr : `seyo-${selected.toLowerCase()}-${(user?.id ?? "").slice(0, 8)}`;
   const copy = async () => {
     await navigator.clipboard.writeText(addr);
     setCopied(true); toast.success("Address copied");

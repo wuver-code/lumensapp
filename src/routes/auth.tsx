@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import logo from "@/assets/lumens-logo.png";
+import logo from "@/assets/seyo-logo.png";
 import { Mail, Lock, User as UserIcon, Loader2, Phone, AtSign } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
-  head: () => ({ meta: [{ title: "Sign in — Lumens" }] }),
+  head: () => ({ meta: [{ title: "Sign in — seyo!" }] }),
 });
 
 type Mode = "signin" | "signup" | "forgot";
@@ -80,8 +80,8 @@ function AuthPage() {
     <div className="min-h-screen flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
-          <img src={logo} alt="Lumens" className="h-32 w-auto mb-3" />
-          <p className="text-sm text-muted-foreground">Messaging meets a wallet.</p>
+          <img src={logo} alt="seyo!" className="h-32 w-auto mb-3" />
+          <p className="text-sm text-muted-foreground">Encrypted chat. Stellar wallet built in.</p>
         </div>
 
         <div className="glass-strong rounded-3xl p-6 shadow-soft">
@@ -194,7 +194,7 @@ function AuthPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-5">
-          By continuing you agree to Lumens'{" "}
+          By continuing you agree to seyo!'s{" "}
           <Link to="/" className="underline">terms</Link>.
         </p>
       </div>

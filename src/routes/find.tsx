@@ -118,7 +118,7 @@ function Find() {
     const { data, error } = await supabase.rpc("find_by_phone_hashes", { _hashes: hashes });
     if (error) return toast.error(error.message);
     setResults((data ?? []) as Profile[]);
-    if (!data?.length) toast("No matches on Lumens yet.");
+    if (!data?.length) toast("No matches on seyo! yet.");
   };
 
   const openRequest = (p: Profile) => {
@@ -243,7 +243,7 @@ function Find() {
             className="w-full bg-transparent text-sm outline-none resize-none"
           />
           <button onClick={checkPhones} className="rounded-full bg-foreground text-background px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-2">
-            <Phone className="h-3.5 w-3.5" /> Check who's on Lumens
+            <Phone className="h-3.5 w-3.5" /> Check who's on seyo!
           </button>
         </div>
       </section>

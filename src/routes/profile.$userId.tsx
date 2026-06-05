@@ -65,7 +65,7 @@ function ContactProfile() {
           <>
             <div className="glass-strong rounded-3xl p-6 shadow-soft flex flex-col items-center text-center">
               <Avatar url={p.avatar_url} name={p.display_name} size={96} />
-              <h2 className="mt-3 text-xl font-bold">{p.display_name ?? p.username ?? "Lumens user"}</h2>
+              <h2 className="mt-3 text-xl font-bold">{p.display_name ?? p.username ?? "seyo! user"}</h2>
               {p.username && <p className="text-sm text-muted-foreground">@{p.username}</p>}
             </div>
 

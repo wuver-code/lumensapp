@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Bell, Settings as SettingsIcon } from "lucide-react";
 import { type ReactNode } from "react";
-import logo from "@/assets/lumens-logo.png";
+import logo from "@/assets/seyo-logo.png";
 
 type Props = {
   title?: string;
@@ -13,7 +13,7 @@ type Props = {
 /**
  * Frosted glassmorphic header used across every page of the app.
  * - Sticky at the top
- * - Lumens logo on the left
+ * - seyo! logo on the left
  * - Title in the middle (optional)
  * - Bell + Settings on the right (plus any extra actions)
  * - Optional `subRow` rendered as a row below the bar (used by Chat)
@@ -22,7 +22,7 @@ export function AppHeader({ title, rightActions, subRow, showLogo = true }: Prop
   return (
     <div className="sticky top-0 z-40 backdrop-blur-xl bg-background/60 border-b border-white/10">
       <div className="mx-auto max-w-md px-4 py-3 flex items-center gap-3">
-        {showLogo && <img src={logo} alt="Lumens" className="h-8 w-auto" />}
+        {showLogo && <img src={logo} alt="seyo!" className="h-8 w-auto" />}
         {title && (
           <h1 className="font-bold text-lg truncate flex-1">{title}</h1>
         )}

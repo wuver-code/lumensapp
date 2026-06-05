@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { ensureKeypair } from "@/lib/crypto";
 import { supabase } from "@/integrations/supabase/client";
 import { getOrCreateWallet, getXlmBalance } from "@/lib/wallet";
-import logo from "@/assets/lumens-logo.png";
+import logo from "@/assets/seyo-logo.png";
 import { Bell, Settings, ArrowUpRight, ArrowDownLeft, ArrowLeftRight, Banknote, MessageCircle, Wallet, ScanLine } from "lucide-react";
 import { cryptoMeta } from "@/components/CryptoIcon";
 
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/")({
   component: Home,
   head: () => ({
     meta: [
-      { title: "Lumens — secure messaging & crypto wallet" },
+      { title: "seyo! — encrypted chat & Stellar wallet" },
       { name: "description", content: "End-to-end encrypted messaging with a built-in non-custodial Stellar wallet." },
     ],
   }),
@@ -74,7 +74,7 @@ function Home() {
           </Link>
           <img
             src={logo}
-            alt="Lumens"
+            alt="seyo!"
             className={`transition-all duration-300 ease-out w-auto ${scrolled ? "h-9" : "h-16"}`}
           />
           <div className="flex items-center gap-2">
