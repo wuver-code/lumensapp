@@ -22,7 +22,7 @@ export function AppHeader({ title, rightActions, subRow, showLogo = true }: Prop
   return (
     <div className="sticky top-0 z-40 backdrop-blur-xl bg-background/60 border-b border-white/10">
       <div className="mx-auto max-w-md px-4 py-3 flex items-center gap-3">
-        {showLogo && <img src={logo} alt="seyo!" className="h-8 w-auto" />}
+        {showLogo && <img src={logo} alt="seyo!" className="h-5 w-auto" />}
         {title && (
           <h1 className="font-bold text-lg truncate flex-1">{title}</h1>
         )}

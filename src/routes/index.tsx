@@ -75,7 +75,7 @@ function Home() {
           <img
             src={logo}
             alt="seyo!"
-            className={`transition-all duration-300 ease-out w-auto ${scrolled ? "h-9" : "h-16"}`}
+            className="h-5 w-auto"
           />
           <div className="flex items-center gap-2">
             <button className="glass h-10 w-10 rounded-full flex items-center justify-center relative" aria-label="Notifications">
