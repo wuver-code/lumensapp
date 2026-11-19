@@ -7,7 +7,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/keys")({ component: KeysPage });
+export const Route = createFileRoute("/keys")({
+  component: KeysPage,
+  head: () => ({ meta: [
+    { title: "Encryption keys — seyo!" },
+    { name: "description", content: "Back up or restore your seyo! encrypted chat keys." },
+    { property: "og:title", content: "Encryption keys — seyo!" },
+    { property: "og:description", content: "Back up or restore your seyo! encrypted chat keys." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 function KeysPage() {
   const { user } = useAuth();

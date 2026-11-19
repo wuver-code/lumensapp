@@ -6,7 +6,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { UserPlus, PenSquare } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 
-export const Route = createFileRoute("/chat")({ component: ChatHome });
+export const Route = createFileRoute("/chat")({
+  component: ChatHome,
+  head: () => ({ meta: [
+    { title: "Chats — seyo!" },
+    { name: "description", content: "Open your private conversations on seyo!." },
+    { property: "og:title", content: "Chats — seyo!" },
+    { property: "og:description", content: "Open your private conversations on seyo!." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 function ChatHome() {
   const { user } = useAuth();

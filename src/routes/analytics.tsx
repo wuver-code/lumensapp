@@ -2,7 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { TrendingUp, ShieldCheck, Wallet as WalletIcon } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 
-export const Route = createFileRoute("/analytics")({ component: AnalyticsPage });
+export const Route = createFileRoute("/analytics")({
+  component: AnalyticsPage,
+  head: () => ({ meta: [
+    { title: "Analytics — seyo!" },
+    { name: "description", content: "Review your seyo! wallet and account analytics." },
+    { property: "og:title", content: "Analytics — seyo!" },
+    { property: "og:description", content: "Review your seyo! wallet and account analytics." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 function AnalyticsPage() {
   return (

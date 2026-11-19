@@ -7,7 +7,17 @@ import { shortAddress } from "@/lib/wallet";
 import { StrKey } from "@stellar/stellar-sdk";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/contacts")({ component: ContactsPage });
+export const Route = createFileRoute("/contacts")({
+  component: ContactsPage,
+  head: () => ({ meta: [
+    { title: "Address book — seyo!" },
+    { name: "description", content: "Manage saved Stellar wallet recipients in seyo!." },
+    { property: "og:title", content: "Address book — seyo!" },
+    { property: "og:description", content: "Manage saved Stellar wallet recipients in seyo!." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 type Contact = { id: string; label: string; address: string; memo: string | null; is_favorite: boolean };
 

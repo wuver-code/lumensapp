@@ -8,7 +8,14 @@ import { Mail, Lock, User as UserIcon, Loader2, Phone, AtSign } from "lucide-rea
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
-  head: () => ({ meta: [{ title: "Sign in — seyo!" }] }),
+  head: () => ({ meta: [
+    { title: "Sign in — seyo!" },
+    { name: "description", content: "Sign in or create your seyo! account for encrypted chat and a Stellar wallet." },
+    { property: "og:title", content: "Sign in — seyo!" },
+    { property: "og:description", content: "Sign in or create your seyo! account for encrypted chat and a Stellar wallet." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 type Mode = "signin" | "signup" | "forgot";
@@ -80,7 +87,7 @@ function AuthPage() {
     <div className="min-h-screen flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
-          <img src={logo} alt="seyo!" className="h-32 w-auto mb-3" />
+          <img src={logo} alt="seyo!" className="h-[25px] w-auto mb-3" />
           <p className="text-sm text-muted-foreground">Encrypted chat. Stellar wallet built in.</p>
         </div>
 

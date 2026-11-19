@@ -5,7 +5,17 @@ import { Html5Qrcode } from "html5-qrcode";
 import { toast } from "sonner";
 import { AppHeader } from "@/components/AppHeader";
 
-export const Route = createFileRoute("/scan")({ component: ScanPage });
+export const Route = createFileRoute("/scan")({
+  component: ScanPage,
+  head: () => ({ meta: [
+    { title: "Scan to pay — seyo!" },
+    { name: "description", content: "Scan Stellar payment QR codes with your seyo! wallet." },
+    { property: "og:title", content: "Scan to pay — seyo!" },
+    { property: "og:description", content: "Scan Stellar payment QR codes with your seyo! wallet." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 function ScanPage() {
   const navigate = useNavigate();

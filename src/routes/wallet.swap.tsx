@@ -7,7 +7,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PinDialog } from "@/components/PinDialog";
 
-export const Route = createFileRoute("/wallet/swap")({ component: SwapPage });
+export const Route = createFileRoute("/wallet/swap")({
+  component: SwapPage,
+  head: () => ({ meta: [
+    { title: "Swap assets — seyo!" },
+    { name: "description", content: "Review and exchange wallet assets with seyo!." },
+    { property: "og:title", content: "Swap assets — seyo!" },
+    { property: "og:description", content: "Review and exchange wallet assets with seyo!." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 const FIATS = ["USD","EUR","GBP"] as const;
 

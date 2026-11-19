@@ -4,7 +4,17 @@ import { ArrowLeft, CheckCircle2, Clock, ExternalLink, XCircle, Copy } from "luc
 import { horizon, explorerTxUrl, NETWORK_LABEL, shortAddress } from "@/lib/wallet";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/tx/$hash")({ component: TxPage });
+export const Route = createFileRoute("/tx/$hash")({
+  component: TxPage,
+  head: () => ({ meta: [
+    { title: "Transaction details — seyo!" },
+    { name: "description", content: "View the status and details of a Stellar transaction in seyo!." },
+    { property: "og:title", content: "Transaction details — seyo!" },
+    { property: "og:description", content: "View the status and details of a Stellar transaction in seyo!." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 type Status = "pending" | "success" | "fail";
 

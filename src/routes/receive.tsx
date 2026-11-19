@@ -5,7 +5,17 @@ import { QRCodeSVG } from "qrcode.react";
 import { getOrCreateWallet, NETWORK_LABEL } from "@/lib/wallet";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/receive")({ component: ReceivePage });
+export const Route = createFileRoute("/receive")({
+  component: ReceivePage,
+  head: () => ({ meta: [
+    { title: "Receive XLM — seyo!" },
+    { name: "description", content: "Share your Stellar address or QR code to receive XLM with seyo!." },
+    { property: "og:title", content: "Receive XLM — seyo!" },
+    { property: "og:description", content: "Share your Stellar address or QR code to receive XLM with seyo!." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 function ReceivePage() {
   const [addr, setAddr] = useState("");

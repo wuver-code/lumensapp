@@ -5,7 +5,17 @@ import { getOrCreateWallet, getAllBalances, changeTrust, shortAddress, type Asse
 import { StrKey } from "@stellar/stellar-sdk";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/trustlines")({ component: TrustlinesPage });
+export const Route = createFileRoute("/trustlines")({
+  component: TrustlinesPage,
+  head: () => ({ meta: [
+    { title: "Trustlines — seyo!" },
+    { name: "description", content: "Manage Stellar asset trustlines in your seyo! wallet." },
+    { property: "og:title", content: "Trustlines — seyo!" },
+    { property: "og:description", content: "Manage Stellar asset trustlines in your seyo! wallet." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 const PRESETS = [
   { code: "USDC", issuer: "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN", note: "Circle (mainnet)" },

@@ -6,7 +6,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Avatar } from "@/components/Avatar";
 import { AppHeader } from "@/components/AppHeader";
 
-export const Route = createFileRoute("/profile/$userId")({ component: ContactProfile });
+export const Route = createFileRoute("/profile/$userId")({
+  component: ContactProfile,
+  head: () => ({ meta: [
+    { title: "Contact profile — seyo!" },
+    { name: "description", content: "View a seyo! contact profile and wallet details." },
+    { property: "og:title", content: "Contact profile — seyo!" },
+    { property: "og:description", content: "View a seyo! contact profile and wallet details." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 type ContactProfile = {
   id: string;

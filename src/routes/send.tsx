@@ -14,6 +14,14 @@ type SendSearch = { to?: string; memo?: string; asset?: string };
 
 export const Route = createFileRoute("/send")({
   component: SendPage,
+  head: () => ({ meta: [
+    { title: "Send payment — seyo!" },
+    { name: "description", content: "Send Stellar assets to a wallet address using seyo!." },
+    { property: "og:title", content: "Send payment — seyo!" },
+    { property: "og:description", content: "Send Stellar assets to a wallet address using seyo!." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   validateSearch: (s: Record<string, unknown>): SendSearch => ({
     to: typeof s.to === "string" ? s.to : undefined,
     memo: typeof s.memo === "string" ? s.memo : undefined,

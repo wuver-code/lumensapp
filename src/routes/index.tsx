@@ -15,6 +15,10 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "seyo! — encrypted chat & Stellar wallet" },
       { name: "description", content: "End-to-end encrypted messaging with a built-in non-custodial Stellar wallet." },
+      { property: "og:title", content: "seyo! — encrypted chat & Stellar wallet" },
+      { property: "og:description", content: "End-to-end encrypted messaging with a built-in non-custodial Stellar wallet." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
 });
@@ -75,7 +79,7 @@ function Home() {
           <img
             src={logo}
             alt="seyo!"
-            className="h-5 w-auto"
+            className={`w-auto transition-all duration-300 ease-out ${scrolled ? "h-4" : "h-5"}`}
           />
           <div className="flex items-center gap-2">
             <button className="glass h-10 w-10 rounded-full flex items-center justify-center relative" aria-label="Notifications">

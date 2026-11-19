@@ -7,7 +7,17 @@ import { toast } from "sonner";
 import { Avatar } from "@/components/Avatar";
 import { AppHeader } from "@/components/AppHeader";
 
-export const Route = createFileRoute("/find")({ component: Find });
+export const Route = createFileRoute("/find")({
+  component: Find,
+  head: () => ({ meta: [
+    { title: "Find people — seyo!" },
+    { name: "description", content: "Find people and manage contact requests on seyo!." },
+    { property: "og:title", content: "Find people — seyo!" },
+    { property: "og:description", content: "Find people and manage contact requests on seyo!." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 type Profile = {
   id: string;

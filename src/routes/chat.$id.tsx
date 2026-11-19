@@ -9,7 +9,17 @@ import { saveMessage, listMessages, type LocalMessage } from "@/lib/messageStore
 import { compressImage, blobToDataUrl, startVoiceRecorder, type Recorder } from "@/lib/media";
 import { Avatar } from "@/components/Avatar";
 
-export const Route = createFileRoute("/chat/$id")({ component: ChatRoom });
+export const Route = createFileRoute("/chat/$id")({
+  component: ChatRoom,
+  head: () => ({ meta: [
+    { title: "Conversation — seyo!" },
+    { name: "description", content: "Send private, end-to-end encrypted messages on seyo!." },
+    { property: "og:title", content: "Conversation — seyo!" },
+    { property: "og:description", content: "Send private, end-to-end encrypted messages on seyo!." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 // Realtime broadcast frames are capped — keep a hard ceiling on per-message ciphertext.
 const MAX_MEDIA_BYTES = 900_000;

@@ -11,6 +11,14 @@ import { getOrCreateWallet } from "@/lib/wallet";
 
 export const Route = createFileRoute("/profile")({
   component: () => <PinGate><ProfilePage /></PinGate>,
+  head: () => ({ meta: [
+    { title: "My profile — seyo!" },
+    { name: "description", content: "Manage your seyo! profile and wallet details." },
+    { property: "og:title", content: "My profile — seyo!" },
+    { property: "og:description", content: "Manage your seyo! profile and wallet details." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 type P = {

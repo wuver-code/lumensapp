@@ -6,7 +6,14 @@ import { Lock, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/reset-password")({
   component: ResetPassword,
-  head: () => ({ meta: [{ title: "Reset password — seyo!" }] }),
+  head: () => ({ meta: [
+    { title: "Reset password — seyo!" },
+    { name: "description", content: "Choose a new password for your seyo! account." },
+    { property: "og:title", content: "Reset password — seyo!" },
+    { property: "og:description", content: "Choose a new password for your seyo! account." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 function ResetPassword() {

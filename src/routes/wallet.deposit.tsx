@@ -7,7 +7,17 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/wallet/deposit")({ component: DepositPage });
+export const Route = createFileRoute("/wallet/deposit")({
+  component: DepositPage,
+  head: () => ({ meta: [
+    { title: "Deposit — seyo!" },
+    { name: "description", content: "View wallet deposit details and receive assets with seyo!." },
+    { property: "og:title", content: "Deposit — seyo!" },
+    { property: "og:description", content: "View wallet deposit details and receive assets with seyo!." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 function DepositPage() {
   const { user } = useAuth();

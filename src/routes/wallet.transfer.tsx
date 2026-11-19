@@ -13,6 +13,14 @@ type Search = { to?: string; asset?: string };
 
 export const Route = createFileRoute("/wallet/transfer")({
   component: TransferPage,
+  head: () => ({ meta: [
+    { title: "Transfer — seyo!" },
+    { name: "description", content: "Send a Stellar asset from your seyo! wallet." },
+    { property: "og:title", content: "Transfer — seyo!" },
+    { property: "og:description", content: "Send a Stellar asset from your seyo! wallet." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   validateSearch: (s: Record<string, unknown>): Search => ({
     to: typeof s.to === "string" ? s.to : undefined,
     asset: typeof s.asset === "string" ? s.asset : "XLM",

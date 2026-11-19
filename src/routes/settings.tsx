@@ -5,7 +5,17 @@ import { useAuth } from "@/lib/auth";
 import { PinDialog } from "@/components/PinDialog";
 import { AppHeader } from "@/components/AppHeader";
 
-export const Route = createFileRoute("/settings")({ component: SettingsPage });
+export const Route = createFileRoute("/settings")({
+  component: SettingsPage,
+  head: () => ({ meta: [
+    { title: "Settings — seyo!" },
+    { name: "description", content: "Manage your seyo! account settings and security options." },
+    { property: "og:title", content: "Settings — seyo!" },
+    { property: "og:description", content: "Manage your seyo! account settings and security options." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 function SettingsPage() {
   const { signOut } = useAuth();
